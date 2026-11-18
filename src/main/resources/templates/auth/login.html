@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card p-4 shadow">
+                    <h2 class="text-center mb-4">Login to Arena Hub</h2>
+
+                    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                        Invalid email or password, or account is disabled.
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-info" role="alert">
+                        You have been logged out successfully.
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control bg-dark text-light border-secondary" id="email" name="email" required autofocus placeholder="name@arenahub.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control bg-dark text-light border-secondary" id="password" name="password" required placeholder="Enter password">
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-accent">Log In</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3 text-secondary">
+                        Don't have an account? <a th:href="@{/register}" class="text-info text-decoration-none">Register here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
