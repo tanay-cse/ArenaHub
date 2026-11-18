@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage Games')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0">Games Management</h1>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admin/stations}" class="btn btn-outline-info">Manage Stations</a>
+                <a th:href="@{/stations}" class="btn btn-outline-light">Public Stations View</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="card p-3 shadow-sm border-secondary">
+                    <h5 class="card-title mb-3" th:text="${game.id == null} ? 'Add New Game' : 'Edit Game ' + ${game.title}">Add Game</h5>
+                    <form th:action="@{/admin/games}" th:object="${game}" method="post">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" th:field="*{title}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. Cyberpunk 2077">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Genre</label>
+                            <input type="text" th:field="*{genre}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. Action RPG">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Platform</label>
+                            <input type="text" th:field="*{platform}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. PC / PS5">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Minimum Age</label>
+                            <input type="number" min="0" th:field="*{minAge}" class="form-control bg-dark text-light border-secondary" required placeholder="0">
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" th:field="*{isActive}" class="form-check-input" id="isActiveCheck">
+                            <label class="form-check-label" for="isActiveCheck">Active Catalog Item</label>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-accent flex-grow-1" th:text="${game.id == null} ? 'Create Game' : 'Update Game'">Save</button>
+                            <a th:if="${game.id != null}" th:href="@{/admin/games}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card p-3 shadow-sm border-secondary">
+                    <h5 class="card-title mb-3">Games Roster</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Genre</th>
+                                    <th>Platform</th>
+                                    <th>Min Age</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="g : ${games}">
+                                    <td class="fw-bold text-info" th:text="${g.title}">Valorant</td>
+                                    <td th:text="${g.genre}">Tactical FPS</td>
+                                    <td th:text="${g.platform}">PC</td>
+                                    <td th:text="${g.minAge} + '+'">16+</td>
+                                    <td>
+                                        <span th:class="'badge ' + (${g.isActive} ? 'bg-success' : 'bg-secondary')"
+                                              th:text="${g.isActive} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a th:href="@{/admin/games/edit/{id}(id=${g.id})}" class="btn btn-outline-light">Edit</a>
+                                            <form th:action="@{/admin/games/toggle/{id}(id=${g.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-warning" th:text="${g.isActive} ? 'Deactivate' : 'Activate'">Toggle</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

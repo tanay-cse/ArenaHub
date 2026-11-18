@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage Stations')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0">Station Management</h1>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admin/games}" class="btn btn-outline-info">Manage Games</a>
+                <a th:href="@{/stations}" class="btn btn-outline-light">Public Stations View</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="card p-3 shadow-sm border-secondary">
+                    <h5 class="card-title mb-3" th:text="${station.id == null} ? 'Add New Station' : 'Edit Station ' + ${station.stationNumber}">Add Station</h5>
+                    <form th:action="@{/admin/stations}" th:object="${station}" method="post">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="mb-3">
+                            <label class="form-label">Station Number</label>
+                            <input type="text" th:field="*{stationNumber}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. ST-VIP-02">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select th:field="*{stationType}" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="PC_VIP">PC_VIP</option>
+                                <option value="PC_STANDARD">PC_STANDARD</option>
+                                <option value="PS5">PS5</option>
+                                <option value="SIMULATOR">SIMULATOR</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select th:field="*{status}" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="AVAILABLE">AVAILABLE</option>
+                                <option value="OCCUPIED">OCCUPIED</option>
+                                <option value="MAINTENANCE">MAINTENANCE</option>
+                                <option value="RESERVED">RESERVED</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hourly Rate (₹)</label>
+                            <input type="number" step="0.01" min="0" th:field="*{hourlyRate}" class="form-control bg-dark text-light border-secondary" required placeholder="100.00">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-accent flex-grow-1" th:text="${station.id == null} ? 'Create Station' : 'Update Station'">Save</button>
+                            <a th:if="${station.id != null}" th:href="@{/admin/stations}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card p-3 shadow-sm border-secondary">
+                    <h5 class="card-title mb-3">Stations Roster & Installed Games</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Station</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Rate</th>
+                                    <th>Installed Games</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="st : ${stations}">
+                                    <td class="fw-bold text-info" th:text="${st.stationNumber}">ST-01</td>
+                                    <td th:text="${st.stationType}">PC_VIP</td>
+                                    <td>
+                                        <span th:class="'badge ' + (${st.status == 'AVAILABLE'} ? 'bg-success' : (${st.status == 'OCCUPIED'} ? 'bg-danger' : 'bg-warning text-dark'))"
+                                              th:text="${st.status}">AVAILABLE</span>
+                                    </td>
+                                    <td class="text-warning" th:text="'₹' + ${st.hourlyRate}">₹150</td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1 align-items-center">
+                                            <span class="badge bg-secondary d-inline-flex align-items-center gap-1" th:each="sg : ${st.stationGames}">
+                                                <span th:text="${sg.game.title}">Game</span>
+                                                <form th:action="@{/admin/stations/{sid}/games/{gid}/remove(sid=${st.id}, gid=${sg.game.id})}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn-close btn-close-white" style="font-size: 0.5rem;" aria-label="Remove"></button>
+                                                </form>
+                                            </span>
+                                            <form th:action="@{/admin/stations/{sid}/games/install(sid=${st.id})}" method="post" class="d-inline-flex gap-1 mt-1">
+                                                <select name="gameId" class="form-select form-select-sm bg-dark text-light border-secondary" style="width: auto;" required>
+                                                    <option value="" disabled selected>+ Install</option>
+                                                    <option th:each="g : ${allGames}" th:value="${g.id}" th:text="${g.title}">Game</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-outline-info">+</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a th:href="@{/admin/stations/edit/{id}(id=${st.id})}" class="btn btn-outline-light">Edit</a>
+                                            <form th:action="@{/admin/stations/delete/{id}(id=${st.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete this station?');">
+                                                <button type="submit" class="btn btn-outline-danger">Del</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
