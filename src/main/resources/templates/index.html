@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="p-5 mb-4 rounded-3 card shadow-sm text-center">
+            <h1 class="display-5 fw-bold mb-3">Welcome to Arena Hub</h1>
+            <p class="lead text-secondary mx-auto col-md-8">
+                Your premier campus gaming and esports arena platform. Book high-performance gaming stations, join tournaments, and track your ELO ranking.
+            </p>
+            <div class="d-flex justify-content-center gap-3 mt-3">
+                <a th:href="@{/bookings}" class="btn btn-accent btn-lg px-4">Book Station</a>
+                <a th:href="@{/tournaments}" class="btn btn-outline-light btn-lg px-4">View Tournaments</a>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
