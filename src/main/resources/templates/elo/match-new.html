@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Record Match')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card p-4 shadow">
+                    <h2 class="text-center mb-4">Record Match Result</h2>
+
+                    <form th:action="@{/matches/new}" method="post">
+                        <div class="mb-3">
+                            <label for="gameId" class="form-label">Game</label>
+                            <select id="gameId" name="gameId" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="" disabled selected>-- Select Game --</option>
+                                <option th:each="g : ${games}" th:value="${g.id}" th:text="${g.title} + ' (' + ${g.platform} + ')'">Valorant (PC)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="opponentId" class="form-label">Opponent</label>
+                            <select id="opponentId" name="opponentId" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="" disabled selected>-- Select Opponent --</option>
+                                <option th:each="opp : ${opponents}" th:value="${opp.id}" th:text="${opp.fullName} + ' (' + ${opp.email} + ')'">Opponent Name (email)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="matchType" class="form-label">Match Type</label>
+                            <select id="matchType" name="matchType" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="CASUAL">CASUAL</option>
+                                <option value="RANKED" selected>RANKED</option>
+                            </select>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="yourScore" class="form-label">Your Score</label>
+                                <input type="number" min="0" id="yourScore" name="yourScore" class="form-control bg-dark text-light border-secondary" required placeholder="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="opponentScore" class="form-label">Opponent Score</label>
+                                <input type="number" min="0" id="opponentScore" name="opponentScore" class="form-control bg-dark text-light border-secondary" required placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-accent">Submit Match Result</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
