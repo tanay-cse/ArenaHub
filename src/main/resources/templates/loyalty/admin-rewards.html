@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage Rewards')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h1 class="h2 mb-0">Rewards Management</h1>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admin/stations}" class="btn btn-outline-info">Manage Stations</a>
+                <a th:href="@{/admin/games}" class="btn btn-outline-info">Manage Games</a>
+                <a th:href="@{/rewards}" class="btn btn-outline-light">Student Rewards View</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="card p-3 shadow-sm border-secondary">
+                    <h5 class="card-title mb-3" th:text="${reward.id == null} ? 'Add New Reward' : 'Edit Reward: ' + ${reward.name}">Add Reward</h5>
+                    <form th:action="@{/admin/rewards}" th:object="${reward}" method="post">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="mb-3">
+                            <label class="form-label">Reward Name</label>
+                            <input type="text" th:field="*{name}" class="form-control bg-dark text-light border-secondary" required maxlength="100" placeholder="e.g. Free 1 Hour Pass">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea th:field="*{description}" class="form-control bg-dark text-light border-secondary" rows="3" placeholder="Details about this reward..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Points Cost</label>
+                            <input type="number" min="1" th:field="*{pointsCost}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. 100">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Stock Quantity</label>
+                            <input type="number" min="0" th:field="*{stockQuantity}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. 50">
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" th:field="*{isActive}" class="form-check-input" id="isActiveCheck">
+                            <label class="form-check-label" for="isActiveCheck">Active (Visible to Students)</label>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-accent flex-grow-1" th:text="${reward.id == null} ? 'Create Reward' : 'Update Reward'">Save</button>
+                            <a th:if="${reward.id != null}" th:href="@{/admin/rewards}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card p-3 shadow-sm border-secondary">
+                    <h5 class="card-title mb-3">Rewards Roster</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Points</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(rewards)}">
+                                    <td colspan="5" class="text-center text-secondary py-3">No rewards found.</td>
+                                </tr>
+                                <tr th:each="r : ${rewards}">
+                                    <td>
+                                        <div class="fw-bold text-info" th:text="${r.name}">Reward Name</div>
+                                        <small class="text-secondary" th:text="${r.description}">Description</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark fw-semibold" th:text="${r.pointsCost} + ' pts'">100 pts</span>
+                                    </td>
+                                    <td th:text="${r.stockQuantity}">50</td>
+                                    <td>
+                                        <span th:class="'badge ' + (${r.isActive} ? 'bg-success' : 'bg-secondary')"
+                                              th:text="${r.isActive} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a th:href="@{/admin/rewards/edit/{id}(id=${r.id})}" class="btn btn-outline-light">Edit</a>
+                                            <form th:if="${r.isActive}" th:action="@{/admin/rewards/deactivate/{id}(id=${r.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger">Deactivate</button>
+                                            </form>
+                                            <form th:unless="${r.isActive}" th:action="@{/admin/rewards/toggle/{id}(id=${r.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-success">Activate</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

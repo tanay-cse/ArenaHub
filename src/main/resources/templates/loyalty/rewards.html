@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Rewards Catalog')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="h2 mb-1">Loyalty Rewards</h1>
+                <p class="text-secondary mb-0">Redeem your hard-earned points for arena perks, free game time, and merchandise.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-info text-dark px-3 py-2">Redemptions open in Week 2</span>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(rewards)}" class="alert alert-secondary text-center my-5">
+            <h5 class="alert-heading">No Rewards Currently Available</h5>
+            <p class="mb-0">Check back soon for new prizes and rewards!</p>
+        </div>
+
+        <div class="row g-4" th:unless="${#lists.isEmpty(rewards)}">
+            <div class="col-md-6 col-lg-3" th:each="reward : ${rewards}">
+                <div class="card h-100 shadow-sm border-secondary d-flex flex-column">
+                    <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
+                        <span class="badge bg-warning text-dark fw-bold fs-6" th:text="${reward.pointsCost} + ' pts'">100 pts</span>
+                        <span th:if="${reward.stockQuantity > 0}" class="badge bg-success" th:text="${reward.stockQuantity} + ' left'">50 left</span>
+                        <span th:unless="${reward.stockQuantity > 0}" class="badge bg-danger">Out of stock</span>
+                    </div>
+                    <div class="card-body flex-grow-1">
+                        <h5 class="card-title text-info fw-bold mb-2" th:text="${reward.name}">Reward Name</h5>
+                        <p class="card-text text-secondary small" th:text="${reward.description} ?: 'No description provided.'">Description</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-secondary pt-0">
+                        <button class="btn btn-outline-secondary w-100 btn-sm" disabled title="Redemption starts in Week 2">
+                            Redeem (Coming Week 2)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

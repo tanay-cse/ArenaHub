@@ -23,11 +23,14 @@
                         <li class="nav-item" sec:authorize="hasRole('STUDENT')">
                             <a class="nav-link" th:href="@{/bookings}">My Bookings</a>
                         </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" th:href="@{/rewards}">Rewards</a>
+                        </li>
                         <li class="nav-item" sec:authorize="hasRole('STAFF')">
                             <a class="nav-link" th:href="@{/stations}">Station Manager</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                            <a class="nav-link" th:href="@{/admin}">Admin Dashboard</a>
+                            <a class="nav-link" th:href="@{/admin/rewards}">Manage Rewards</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
