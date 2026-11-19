@@ -2,7 +2,7 @@ spring:
   application:
     name: arenahub
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:mysql://localhost:3306/arenahub?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}}
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:mysql://localhost:3306/arenahub?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=SERVER&forceConnectionTimeZoneToSession=true}}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:root}}
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
     driver-class-name: com.mysql.cj.jdbc.Driver
