@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="h2 mb-1">Admin Dashboard</h1>
+                <p class="text-secondary mb-0">Overview of Arena Hub key platform metrics and operations.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a th:href="@{/admin/stations}" class="btn btn-outline-info btn-sm">Stations</a>
+                <a th:href="@{/admin/games}" class="btn btn-outline-info btn-sm">Games</a>
+                <a th:href="@{/admin/rewards}" class="btn btn-outline-info btn-sm">Rewards</a>
+                <a th:href="@{/admin/tournaments/new}" class="btn btn-outline-info btn-sm">New Tournament</a>
+                <a th:href="@{/admin/audit}" class="btn btn-outline-info btn-sm">Audit Logs</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="card p-3 shadow-sm border-secondary h-100">
+                    <span class="text-secondary text-uppercase small fw-bold">Total Users</span>
+                    <div class="display-4 fw-bold text-info my-2" th:text="${totalUsers}">0</div>
+                    <small class="text-secondary">Registered accounts across all roles</small>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="card p-3 shadow-sm border-secondary h-100">
+                    <span class="text-secondary text-uppercase small fw-bold">Total Stations</span>
+                    <div class="display-4 fw-bold text-success my-2" th:text="${totalStations}">0</div>
+                    <small class="text-secondary">Gaming PCs, consoles, and simulators</small>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="card p-3 shadow-sm border-secondary h-100">
+                    <span class="text-secondary text-uppercase small fw-bold">Total Bookings</span>
+                    <div class="display-4 fw-bold text-warning my-2" th:text="${totalBookings}">0</div>
+                    <small class="text-secondary">All reservations across all statuses</small>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="card p-3 shadow-sm border-secondary h-100">
+                    <span class="text-secondary text-uppercase small fw-bold">Upcoming Tournaments</span>
+                    <div class="display-4 fw-bold text-primary my-2" th:text="${upcomingTournaments}">0</div>
+                    <small class="text-secondary">Future scheduled active tournaments</small>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
