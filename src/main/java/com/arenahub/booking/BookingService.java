@@ -4,6 +4,7 @@ import com.arenahub.auth.User;
 import com.arenahub.auth.UserRepository;
 import com.arenahub.catalog.Station;
 import com.arenahub.catalog.StationRepository;
+import com.arenahub.loyalty.LoyaltyService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +21,20 @@ public class BookingService {
     private final UserRepository userRepository;
     private final WaitlistService waitlistService;
     private final PricingService pricingService;
+    private final LoyaltyService loyaltyService;
 
     public BookingService(BookingRepository bookingRepository,
                           StationRepository stationRepository,
                           UserRepository userRepository,
                           WaitlistService waitlistService,
-                          PricingService pricingService) {
+                          PricingService pricingService,
+                          LoyaltyService loyaltyService) {
         this.bookingRepository = bookingRepository;
         this.stationRepository = stationRepository;
         this.userRepository = userRepository;
         this.waitlistService = waitlistService;
         this.pricingService = pricingService;
+        this.loyaltyService = loyaltyService;
     }
 
     @Transactional(readOnly = true)
@@ -80,11 +84,22 @@ public class BookingService {
         booking.setStatus("CONFIRMED");
         booking.setTotalPrice(pricingService.calculatePrice(stationId, normalizedStartTime.getHour()));
 
+        Booking saved;
         try {
-            return bookingRepository.save(booking);
+            saved = bookingRepository.save(booking);
         } catch (DataIntegrityViolationException ex) {
             throw new SlotAlreadyBookedException("Slot already booked for this station. Please choose another time or station.", ex);
         }
+
+        loyaltyService.addPoints(
+                user.getId(),
+                10,
+                "EARNED_BOOKING",
+                "Booking #" + saved.getId() + " at " + station.getStationNumber(),
+                saved
+        );
+
+        return saved;
     }
 
     @Transactional
@@ -179,10 +194,21 @@ public class BookingService {
         booking.setEndTime(normalizedEndTime);
         booking.setTotalPrice(pricingService.calculatePrice(newStationId, normalizedStartTime.getHour()));
 
+        Booking saved;
         try {
-            return bookingRepository.saveAndFlush(booking);
+            saved = bookingRepository.saveAndFlush(booking);
         } catch (DataIntegrityViolationException ex) {
             throw new SlotAlreadyBookedException("Slot already booked for this station. Please choose another time or station.", ex);
         }
+
+        loyaltyService.addPoints(
+                saved.getUser().getId(),
+                10,
+                "EARNED_BOOKING",
+                "Booking #" + saved.getId() + " at " + station.getStationNumber(),
+                saved
+        );
+
+        return saved;
     }
 }

@@ -2,6 +2,7 @@ package com.arenahub.loyalty;
 
 import com.arenahub.auth.User;
 import com.arenahub.auth.UserRepository;
+import com.arenahub.booking.Booking;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,10 @@ public class LoyaltyService {
     }
 
     public void addPoints(Long userId, int pointsChange, String transactionType, String description) {
+        addPoints(userId, pointsChange, transactionType, description, null);
+    }
+
+    public void addPoints(Long userId, int pointsChange, String transactionType, String description, Booking booking) {
         if (pointsChange == 0) {
             throw new IllegalArgumentException("Points change cannot be zero.");
         }
@@ -38,6 +43,9 @@ public class LoyaltyService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
         PointsLedger entry = new PointsLedger(user, pointsChange, transactionType, description);
+        if (booking != null) {
+            entry.setBooking(booking);
+        }
         pointsLedgerRepository.save(entry);
     }
 

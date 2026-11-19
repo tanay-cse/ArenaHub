@@ -12,7 +12,9 @@
                 <p class="text-secondary mb-0">Redeem your hard-earned points for arena perks, free game time, and merchandise.</p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-info text-dark px-3 py-2">Redemptions open in Week 2</span>
+                <span th:if="${userBalance != null}" class="badge bg-warning text-dark px-3 py-2 fs-6">
+                    <i class="bi bi-star-fill me-1"></i>Your Balance: <strong th:text="${userBalance} + ' pts'">0 pts</strong>
+                </span>
             </div>
         </div>
 
@@ -34,8 +36,17 @@
                         <p class="card-text text-secondary small" th:text="${reward.description} ?: 'No description provided.'">Description</p>
                     </div>
                     <div class="card-footer bg-transparent border-secondary pt-0">
-                        <button class="btn btn-outline-secondary w-100 btn-sm" disabled title="Redemption starts in Week 2">
-                            Redeem (Coming Week 2)
+                        <form th:if="${reward.stockQuantity > 0}"
+                              th:action="@{/rewards/{id}/redeem(id=${reward.id})}"
+                              method="post"
+                              th:data-confirm="|Are you sure you want to redeem ${reward.name} for ${reward.pointsCost} points?|"
+                              onsubmit="return confirm(this.getAttribute('data-confirm'));">
+                            <button type="submit" class="btn btn-accent w-100 btn-sm">
+                                <i class="bi bi-gift me-1"></i>Redeem
+                            </button>
+                        </form>
+                        <button th:unless="${reward.stockQuantity > 0}" class="btn btn-outline-secondary w-100 btn-sm" disabled>
+                            Out of Stock
                         </button>
                     </div>
                 </div>

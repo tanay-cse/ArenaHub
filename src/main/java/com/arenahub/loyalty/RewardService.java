@@ -1,5 +1,7 @@
 package com.arenahub.loyalty;
 
+import com.arenahub.auth.User;
+import com.arenahub.auth.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +13,15 @@ import java.util.Optional;
 public class RewardService {
 
     private final RewardRepository rewardRepository;
+    private final PointsLedgerRepository pointsLedgerRepository;
+    private final UserRepository userRepository;
 
-    public RewardService(RewardRepository rewardRepository) {
+    public RewardService(RewardRepository rewardRepository,
+                         PointsLedgerRepository pointsLedgerRepository,
+                         UserRepository userRepository) {
         this.rewardRepository = rewardRepository;
+        this.pointsLedgerRepository = pointsLedgerRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
@@ -83,5 +91,31 @@ public class RewardService {
                 .orElseThrow(() -> new IllegalArgumentException("Reward not found with ID: " + id));
         reward.setIsActive(!Boolean.TRUE.equals(reward.getIsActive()));
         rewardRepository.save(reward);
+    }
+
+    @Transactional
+    public void redeemReward(Long rewardId, Long userId) {
+        Reward reward = rewardRepository.findByIdForUpdate(rewardId)
+                .orElseThrow(() -> new IllegalArgumentException("Reward not found with ID: " + rewardId));
+
+        if (!Boolean.TRUE.equals(reward.getIsActive()) || reward.getStockQuantity() <= 0) {
+            throw new OutOfStockException("Reward '" + reward.getName() + "' is out of stock or currently unavailable.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        Long currentBalance = pointsLedgerRepository.calculateBalanceByUserId(userId);
+        int balance = currentBalance != null ? currentBalance.intValue() : 0;
+
+        if (balance < reward.getPointsCost()) {
+            throw new InsufficientPointsException("Insufficient points: you have " + balance + " points, but this reward costs " + reward.getPointsCost() + " points.");
+        }
+
+        reward.setStockQuantity(reward.getStockQuantity() - 1);
+        rewardRepository.save(reward);
+
+        PointsLedger entry = new PointsLedger(user, null, reward, -reward.getPointsCost(), "REWARD_REDEMPTION", "Redeemed: " + reward.getName());
+        pointsLedgerRepository.save(entry);
     }
 }
