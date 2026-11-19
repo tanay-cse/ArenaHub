@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reschedule Booking')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="card p-4 shadow-sm">
+                    <h2 class="card-title text-center mb-2">Reschedule Booking</h2>
+                    <p class="text-muted text-center mb-4 small">
+                        Modify your station and reservation time slot.
+                    </p>
+
+                    <div class="p-3 mb-4 rounded-3 bg-light border border-secondary-subtle">
+                        <div class="small text-muted mb-1">Current Booking Details:</div>
+                        <div class="fw-bold text-dark">
+                            <span th:text="${booking.station.stationNumber}">ST-VIP-01</span>
+                            (<span th:text="${booking.station.stationType}">PC_VIP</span>)
+                        </div>
+                        <div class="small text-muted">
+                            <span th:text="${#temporals.format(booking.startTime, 'EEEE, MMM dd, yyyy')}">Monday, Nov 26, 2026</span>
+                            &middot;
+                            <span th:text="${#temporals.format(booking.startTime, 'HH:mm')} + ' – ' + ${#temporals.format(booking.endTime, 'HH:mm')}">15:00 – 16:00</span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/bookings/{id}/reschedule(id=${booking.id})}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Select Station</label>
+                            <select name="station_id" class="form-select" required>
+                                <option th:each="st : ${stations}" th:value="${st.id}"
+                                        th:text="${st.stationNumber} + ' (' + ${st.stationType} + ' - ₹' + ${st.hourlyRate} + '/hr)'"
+                                        th:selected="${st.id == booking.station.id}">
+                                    Station
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">New Date</label>
+                            <input type="date" name="date" class="form-control"
+                                   th:value="${#temporals.format(booking.startTime, 'yyyy-MM-dd')}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">New Hour Slot (10:00 – 21:00)</label>
+                            <select name="hour" class="form-select" required>
+                                <option th:each="h : ${#numbers.sequence(10, 21)}" th:value="${h}"
+                                        th:text="${h} + ':00 – ' + ${h + 1} + ':00'"
+                                        th:selected="${h == booking.startTime.hour}">
+                                    10:00 – 11:00
+                                </option>
+                            </select>
+                            <div class="form-text">All sessions are 1-hour blocks aligned on the hour.</div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-accent flex-grow-1">Confirm Reschedule</button>
+                            <a th:href="@{/bookings/mine}" class="btn btn-outline-dark">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

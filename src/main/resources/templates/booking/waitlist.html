@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Waitlist')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="fw-bold mb-1">My Waitlist</h2>
+                <p class="text-muted mb-0">Track notifications for fully booked station slots.</p>
+            </div>
+            <div>
+                <a th:href="@{/bookings}" class="btn btn-outline-dark btn-sm me-2">
+                    <i class="bi bi-calendar-check me-1"></i>Book a Station
+                </a>
+                <a th:href="@{/bookings/mine}" class="btn btn-accent btn-sm">
+                    <i class="bi bi-clock-history me-1"></i>My Bookings
+                </a>
+            </div>
+        </div>
+
+        <div class="card p-4 shadow-sm">
+            <div th:if="${#lists.isEmpty(entries)}" class="text-center py-5">
+                <div class="mb-3 text-muted">
+                    <i class="bi bi-hourglass-split display-4"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No waitlist entries</h5>
+                <p class="text-muted mb-4">You have not joined any station waitlists.</p>
+                <a th:href="@{/bookings}" class="btn btn-navy btn-sm">Explore Stations</a>
+            </div>
+
+            <div class="table-responsive" th:unless="${#lists.isEmpty(entries)}">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Date</th>
+                            <th>Requested Hour</th>
+                            <th>Status</th>
+                            <th>Joined At</th>
+                            <th>Notified At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="entry : ${entries}">
+                            <td>
+                                <div class="fw-bold" th:text="${entry.station.stationNumber}">ST-VIP-01</div>
+                                <span class="badge bg-dark" th:text="${entry.station.stationType}">PC_VIP</span>
+                            </td>
+                            <td th:text="${#temporals.format(entry.requestedDate, 'MMM dd, yyyy')}">Nov 26, 2026</td>
+                            <td>
+                                <span class="fw-semibold" th:text="${entry.requestedHour} + ':00 – ' + ${entry.requestedHour + 1} + ':00'">14:00 – 15:00</span>
+                            </td>
+                            <td>
+                                <span th:if="${entry.status == 'WAITING'}" class="badge bg-warning text-dark">WAITING</span>
+                                <span th:if="${entry.status == 'NOTIFIED'}" class="badge bg-success">NOTIFIED</span>
+                                <span th:if="${entry.status == 'FULFILLED'}" class="badge bg-primary">FULFILLED</span>
+                                <span th:if="${entry.status == 'EXPIRED'}" class="badge bg-secondary">EXPIRED</span>
+                                <span th:if="${entry.status == 'CANCELLED'}" class="badge bg-danger">CANCELLED</span>
+                            </td>
+                            <td class="text-muted small" th:text="${#temporals.format(entry.createdAt, 'yyyy-MM-dd HH:mm')}">2026-11-20 10:00</td>
+                            <td>
+                                <span th:if="${entry.notifiedAt != null}" class="text-success fw-semibold small"
+                                      th:text="${#temporals.format(entry.notifiedAt, 'yyyy-MM-dd HH:mm')}">2026-11-20 10:30</span>
+                                <span th:if="${entry.notifiedAt == null}" class="text-muted small">–</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

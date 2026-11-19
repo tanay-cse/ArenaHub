@@ -8,15 +8,21 @@
     <main class="container my-5 flex-grow-1">
         <div class="row justify-content-center">
             <div class="col-md-7 col-lg-6">
+                <div class="d-flex justify-content-end mb-3">
+                    <a th:href="@{/bookings/mine}" class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-clock-history me-1"></i>View My Bookings
+                    </a>
+                </div>
                 <div class="card p-4 shadow-sm border-secondary">
                     <h2 class="card-title text-center mb-4">Reserve a Gaming Station</h2>
                     <form th:action="@{/bookings}" method="post">
                         <div class="mb-3">
                             <label class="form-label">Select Station</label>
                             <select name="stationId" class="form-select bg-dark text-light border-secondary" required>
-                                <option value="" disabled selected>-- Choose Station --</option>
+                                <option value="" disabled th:selected="${selectedStationId == null}">-- Choose Station --</option>
                                 <option th:each="st : ${stations}" th:value="${st.id}"
-                                        th:text="${st.stationNumber} + ' (' + ${st.stationType} + ' - ₹' + ${st.hourlyRate} + '/hr)'">
+                                        th:text="${st.stationNumber} + ' (' + ${st.stationType} + ' - ₹' + ${st.hourlyRate} + '/hr)'"
+                                        th:selected="${selectedStationId != null and st.id == selectedStationId}">
                                     Station
                                 </option>
                             </select>
@@ -24,7 +30,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Slot Start Time (1 Hour Session)</label>
-                            <input type="datetime-local" name="startTime" class="form-control bg-dark text-light border-secondary" required>
+                            <input type="datetime-local" name="startTime" class="form-control bg-dark text-light border-secondary" required th:value="${prefilledStartTime}">
                             <div class="form-text text-secondary">Slots are 1 hour blocks.</div>
                         </div>
 
@@ -32,6 +38,21 @@
                             <button type="submit" class="btn btn-accent btn-lg">Confirm Booking</button>
                         </div>
                     </form>
+
+                    <div th:if="${showWaitlistButton}" class="alert alert-warning mt-4 p-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <strong>This slot is currently full.</strong>
+                                <div class="small">Join the waitlist to be notified first if this reservation is cancelled.</div>
+                            </div>
+                            <form th:action="@{/waitlist/join}" method="post" class="d-inline">
+                                <input type="hidden" name="stationId" th:value="${unavailableStationId}"/>
+                                <input type="hidden" name="date" th:value="${unavailableDate}"/>
+                                <input type="hidden" name="hour" th:value="${unavailableHour}"/>
+                                <button type="submit" class="btn btn-warning btn-sm">Join waitlist</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

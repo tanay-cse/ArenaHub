@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage Pricing Rules')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="h2 mb-1">Pricing Rules Management</h1>
+                <p class="text-secondary mb-0">Configure dynamic peak, off-peak, and member rate multipliers.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admin}" class="btn btn-outline-dark btn-sm">Dashboard</a>
+                <a th:href="@{/admin/stations}" class="btn btn-outline-dark btn-sm">Stations</a>
+                <a th:href="@{/bookings}" class="btn btn-outline-dark btn-sm">Bookings View</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="card p-4 shadow-sm">
+                    <h5 class="card-title mb-3" th:text="${rule.id == null} ? 'Add Pricing Rule' : 'Edit Rule #' + ${rule.id}">Add Pricing Rule</h5>
+                    <form th:action="@{/admin/pricing-rules}" th:object="${rule}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="mb-3">
+                            <label class="form-label">Rule Name</label>
+                            <input type="text" th:field="*{ruleName}" class="form-control" required maxlength="100" placeholder="e.g. Evening Peak">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Station Type</label>
+                            <select th:field="*{stationType}" class="form-select">
+                                <option value="">-- All Station Types (NULL) --</option>
+                                <option value="PC_VIP">PC_VIP</option>
+                                <option value="PC_STANDARD">PC_STANDARD</option>
+                                <option value="PS5">PS5</option>
+                                <option value="SIMULATOR">SIMULATOR</option>
+                            </select>
+                            <div class="form-text">Leave blank to apply to all station categories.</div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Start Hour (0-23)</label>
+                                <input type="number" min="0" max="23" th:field="*{startHour}" class="form-control" required placeholder="18">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">End Hour (1-24)</label>
+                                <input type="number" min="1" max="24" th:field="*{endHour}" class="form-control" required placeholder="22">
+                            </div>
+                            <div class="col-12">
+                                <div class="form-text">Range is [startHour, endHour). E.g. 18-22 covers 18:00 to 21:59.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rate Type</label>
+                            <select th:field="*{rateType}" class="form-select" required>
+                                <option value="PEAK">PEAK</option>
+                                <option value="OFF_PEAK">OFF_PEAK</option>
+                                <option value="MEMBER">MEMBER</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Multiplier</label>
+                            <input type="number" step="0.01" min="0.01" max="99.99" th:field="*{multiplier}" class="form-control" required placeholder="1.50">
+                            <div class="form-text">e.g. 1.50 for +50%, 0.80 for 20% discount.</div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" th:field="*{isActive}" class="form-check-input" id="isActiveCheck">
+                            <label class="form-check-label" for="isActiveCheck">Active</label>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-accent flex-grow-1" th:text="${rule.id == null} ? 'Create Rule' : 'Update Rule'">Save</button>
+                            <a th:if="${rule.id != null}" th:href="@{/admin/pricing-rules}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card p-4 shadow-sm">
+                    <h5 class="card-title mb-3">Active &amp; Inactive Rules</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Rule Name</th>
+                                    <th>Target</th>
+                                    <th>Hours</th>
+                                    <th>Type</th>
+                                    <th>Multiplier</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(rules)}">
+                                    <td colspan="7" class="text-center text-muted py-4">No pricing rules configured.</td>
+                                </tr>
+                                <tr th:each="r : ${rules}">
+                                    <td>
+                                        <div class="fw-bold text-dark" th:text="${r.ruleName}">Rule Name</div>
+                                        <small class="text-muted" th:text="'ID: ' + ${r.id}">ID: 1</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border" th:text="${r.stationType != null and !r.stationType.isBlank()} ? ${r.stationType} : 'ALL STATIONS'">ALL STATIONS</span>
+                                    </td>
+                                    <td>
+                                        <span class="small fw-semibold" th:text="${r.startHour} + ':00 – ' + ${r.endHour} + ':00'">18:00 – 22:00</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${r.rateType == 'PEAK'}" class="badge bg-danger">PEAK</span>
+                                        <span th:if="${r.rateType == 'OFF_PEAK'}" class="badge bg-info text-dark">OFF_PEAK</span>
+                                        <span th:if="${r.rateType == 'MEMBER'}" class="badge bg-success">MEMBER</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark" th:text="${r.multiplier} + 'x'">1.50x</span>
+                                    </td>
+                                    <td>
+                                        <span th:class="'badge ' + (${r.isActive} ? 'bg-success' : 'bg-secondary')"
+                                              th:text="${r.isActive} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a th:href="@{/admin/pricing-rules/edit/{id}(id=${r.id})}" class="btn btn-outline-dark btn-sm">Edit</a>
+                                            <form th:if="${r.isActive}" th:action="@{/admin/pricing-rules/deactivate/{id}(id=${r.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Deactivate</button>
+                                            </form>
+                                            <form th:unless="${r.isActive}" th:action="@{/admin/pricing-rules/toggle/{id}(id=${r.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-success btn-sm">Activate</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

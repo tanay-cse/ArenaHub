@@ -28,7 +28,10 @@
                             <a class="nav-link" th:href="@{/}">Home</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('STUDENT')">
-                            <a class="nav-link" th:href="@{/bookings}">My Bookings</a>
+                            <a class="nav-link" th:href="@{/bookings/mine}">My Bookings</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="hasRole('STUDENT')">
+                            <a class="nav-link" th:href="@{/waitlist}">Waitlist</a>
                         </li>
                         <li class="nav-item" sec:authorize="isAuthenticated()">
                             <a class="nav-link" th:href="@{/points}">My Points</a>
@@ -50,6 +53,9 @@
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                             <a class="nav-link" th:href="@{/admin/rewards}">Manage Rewards</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                            <a class="nav-link" th:href="@{/admin/pricing-rules}">Pricing Rules</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                             <a class="nav-link" th:href="@{/admin/tournaments/new}">New Tournament</a>
