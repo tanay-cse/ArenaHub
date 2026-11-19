@@ -6,16 +6,261 @@
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
 
     <main class="container my-5 flex-grow-1">
-        <div class="p-5 mb-4 rounded-3 card shadow-sm text-center">
-            <h1 class="display-5 fw-bold mb-3">Welcome to Arena Hub</h1>
-            <p class="lead text-secondary mx-auto col-md-8">
-                Your premier campus gaming and esports arena platform. Book high-performance gaming stations, join tournaments, and track your ELO ranking.
-            </p>
-            <div class="d-flex justify-content-center gap-3 mt-3">
-                <a th:href="@{/bookings}" class="btn btn-accent btn-lg px-4">Book Station</a>
-                <a th:href="@{/tournaments}" class="btn btn-outline-light btn-lg px-4">View Tournaments</a>
+        <!-- (a) Hero section -->
+        <section class="mb-5">
+            <div class="hero-panel p-4 p-md-5 position-relative">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 position-relative" style="z-index: 2;">
+                        <span class="badge rounded-pill bg-white text-dark mb-3 px-3 py-2 shadow-sm fw-semibold">
+                            <i class="bi bi-controller me-1 text-primary"></i> Campus Gaming Lounge
+                        </span>
+                        <h1 class="display-4 fw-bold text-white mb-3">
+                            Level Up Your Campus Gaming Experience
+                        </h1>
+                        <p class="lead text-white-50 mb-4 col-lg-10">
+                            Reserve high-spec gaming rigs, compete in campus esports tournaments, track your ELO rating, and unlock exclusive rewards.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3 mb-5">
+                            <a th:href="@{/bookings}" class="btn btn-accent btn-lg px-4">
+                                <i class="bi bi-calendar-check me-2"></i>Book a station
+                            </a>
+                            <a th:href="@{/tournaments}" class="btn btn-outline-light btn-lg px-4">
+                                <i class="bi bi-trophy me-2"></i>View tournaments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating white card in bottom-left -->
+                <div class="floating-station-card mt-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="pulse-dot"></span>
+                        <div>
+                            <div class="small fw-bold text-dark">Next free station &middot; Station 4 &middot; Today 18:00–19:00</div>
+                            <div class="text-muted small">PC VIP &middot; RTX 4080 &middot; 240Hz Display</div>
+                        </div>
+                    </div>
+                    <a th:href="@{/bookings}" class="btn btn-navy btn-sm px-3 ms-auto">Reserve</a>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- (b) Stats strip -->
+        <section class="mb-5">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="card p-3 p-md-4 text-center h-100">
+                        <div class="mb-2">
+                            <span class="stat-box-digit display-6 fs-3">24</span>
+                        </div>
+                        <div class="fw-bold text-dark mb-1">Stations</div>
+                        <div class="text-muted small">High-spec rigs &amp; consoles</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card p-3 p-md-4 text-center h-100">
+                        <div class="mb-2">
+                            <span class="stat-box-digit display-6 fs-3">1,250+</span>
+                        </div>
+                        <div class="fw-bold text-dark mb-1">Players</div>
+                        <div class="text-muted small">Active campus gamers</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card p-3 p-md-4 text-center h-100">
+                        <div class="mb-2">
+                            <span class="stat-box-digit display-6 fs-3">48</span>
+                        </div>
+                        <div class="fw-bold text-dark mb-1">Tournaments</div>
+                        <div class="text-muted small">Official semester events</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card p-3 p-md-4 text-center h-100">
+                        <div class="mb-2">
+                            <span class="stat-box-digit display-6 fs-3">3,800+</span>
+                        </div>
+                        <div class="fw-bold text-dark mb-1">Matches</div>
+                        <div class="text-muted small">Ranked 1v1 and team battles</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- (c) 3-step "How it works" section -->
+        <section id="how-it-works" class="mb-5 py-3">
+            <div class="text-center mb-5">
+                <span class="badge rounded-pill bg-light text-primary border border-primary-subtle px-3 py-2 mb-2 fw-semibold">Easy as 1-2-3</span>
+                <h2 class="fw-bold">How It Works</h2>
+                <p class="text-muted mx-auto col-md-6">Getting into the game has never been smoother. Follow three quick steps to play at Arena Hub.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card p-4 h-100 position-relative">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-navy px-3 py-2 fs-6">01</span>
+                            <i class="bi bi-person-plus fs-2 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Register</h4>
+                        <p class="text-muted mb-0">Create your player profile using your campus email. Instantly unlock booking access and automatic loyalty tracking.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-4 h-100 position-relative">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-navy px-3 py-2 fs-6">02</span>
+                            <i class="bi bi-calendar-event fs-2 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Book</h4>
+                        <p class="text-muted mb-0">Browse real-time station availability. Lock in guaranteed 1-hour sessions for VIP PCs, PlayStation 5, or racing rigs.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-4 h-100 position-relative">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-navy px-3 py-2 fs-6">03</span>
+                            <i class="bi bi-lightning-charge fs-2 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Compete</h4>
+                        <p class="text-muted mb-0">Check in at your station, log ranked match results, earn Arena Points, and climb the campus ELO leaderboard.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- (d) 3 feature cards -->
+        <section class="mb-5 py-3">
+            <div class="text-center mb-5">
+                <span class="badge rounded-pill bg-light text-primary border border-primary-subtle px-3 py-2 mb-2 fw-semibold">Arena Features</span>
+                <h2 class="fw-bold">Everything You Need to Play &amp; Compete</h2>
+                <p class="text-muted mx-auto col-md-6">Built specifically for campus esports enthusiasts and casual gamers alike.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card p-4 h-100 d-flex flex-column">
+                        <div class="rounded-3 bg-light p-3 d-inline-flex align-items-center justify-content-center mb-4" style="width: 56px; height: 56px;">
+                            <i class="bi bi-pc-display fs-3 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Book a Station</h4>
+                        <p class="text-muted mb-4 flex-grow-1">Choose between ultra-fast PC VIP setups, console lounges, and precision simulators with transparent hourly rates and instant reservations.</p>
+                        <div>
+                            <a th:href="@{/bookings}" class="btn btn-outline-dark btn-sm px-3">
+                                Reserve Station <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-4 h-100 d-flex flex-column">
+                        <div class="rounded-3 bg-light p-3 d-inline-flex align-items-center justify-content-center mb-4" style="width: 56px; height: 56px;">
+                            <i class="bi bi-star fs-3 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Earn Points</h4>
+                        <p class="text-muted mb-4 flex-grow-1">Earn loyalty points on every booked hour and recorded match victory. Redeem your balance for free gaming sessions, drinks, and merchandise.</p>
+                        <div>
+                            <a th:href="@{/rewards}" class="btn btn-outline-dark btn-sm px-3">
+                                View Rewards <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-4 h-100 d-flex flex-column">
+                        <div class="rounded-3 bg-light p-3 d-inline-flex align-items-center justify-content-center mb-4" style="width: 56px; height: 56px;">
+                            <i class="bi bi-trophy fs-3 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Compete in Tournaments</h4>
+                        <p class="text-muted mb-4 flex-grow-1">Register for campus brackets across Valorant, EA FC, Tekken, and Rocket League. Climb the official campus ELO leaderboard.</p>
+                        <div>
+                            <a th:href="@{/tournaments}" class="btn btn-outline-dark btn-sm px-3">
+                                See Tournaments <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- (e) Short FAQ using Bootstrap accordion -->
+        <section id="faq" class="mb-5 py-3">
+            <div class="text-center mb-5">
+                <span class="badge rounded-pill bg-light text-primary border border-primary-subtle px-3 py-2 mb-2 fw-semibold">Got Questions?</span>
+                <h2 class="fw-bold">Frequently Asked Questions</h2>
+                <p class="text-muted mx-auto col-md-6">Find quick answers to common questions about Arena Hub rules, hardware, and reservations.</p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeadingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="true" aria-controls="faqCollapseOne">
+                                    How do I reserve a station at Arena Hub?
+                                </button>
+                            </h2>
+                            <div id="faqCollapseOne" class="accordion-collapse collapse show" aria-labelledby="faqHeadingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Log in with your registered student account, click on "Book a station", choose your desired station (PC VIP, PS5, Racing Sim), and select an available 1-hour slot starting on the hour. You'll receive instant confirmation.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeadingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
+                                    How does the ELO rating system work?
+                                </button>
+                            </h2>
+                            <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Every registered player starts with a base rating of 1200. When you play against another registered member, either player can submit the match result via "Record match". The system computes new ELO ratings using standard competitive tournament math.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeadingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
+                                    How do points and rewards work?
+                                </button>
+                            </h2>
+                            <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqHeadingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    You automatically earn points for completing bookings and winning competitive matches. Check the "Rewards" store to redeem your accumulated points for free station time, snacks, and exclusive arena merchandise.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeadingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFour" aria-expanded="false" aria-controls="faqCollapseFour">
+                                    Who can participate in tournaments?
+                                </button>
+                            </h2>
+                            <div id="faqCollapseFour" class="accordion-collapse collapse" aria-labelledby="faqHeadingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    All students with an active Arena Hub account can browse open tournaments under the "Tournaments" tab and register before slots fill up. Brackets and match schedules are updated in real time.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- (f) Closing CTA band on --bg-dark panel -->
+        <section class="mb-4">
+            <div class="cta-panel text-center">
+                <h2 class="display-6 fw-bold text-white mb-3">Ready to Enter the Arena?</h2>
+                <p class="text-white-50 lead mx-auto col-md-8 mb-4">
+                    Join your fellow campus gamers today. Book your first gaming session or enter the next tournament bracket.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a th:href="@{/bookings}" class="btn btn-accent btn-lg px-4">
+                        <i class="bi bi-controller me-2"></i>Book a Station Now
+                    </a>
+                    <a th:href="@{/tournaments}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-trophy me-2"></i>Explore Tournaments
+                    </a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
