@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Leaderboard')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="bi bi-trophy-fill text-warning me-2"></i>Game Leaderboard</h2>
+                <p class="text-muted mb-0">Player rankings and match records by game.</p>
+            </div>
+            <div>
+                <a th:href="@{/matches/new}" class="btn btn-accent btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Record Match
+                </a>
+                <a th:href="@{/matches/mine}" class="btn btn-outline-dark btn-sm ms-2">
+                    <i class="bi bi-clock-history me-1"></i>My Matches
+                </a>
+            </div>
+        </div>
+
+        <!-- Game Selector Pills / Dropdown -->
+        <div class="card p-3 shadow-sm mb-4">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <span class="fw-semibold me-2 text-muted"><i class="bi bi-controller me-1"></i>Select Game:</span>
+                <div class="d-flex flex-wrap gap-2">
+                    <a th:each="g : ${games}" 
+                       th:href="@{/leaderboard/{id}(id=${g.id})}"
+                       th:class="${selectedGame != null and selectedGame.id == g.id} ? 'btn btn-navy btn-sm' : 'btn btn-outline-secondary btn-sm'"
+                       th:text="${g.title} + ' (' + ${g.platform} + ')'">
+                        Valorant (PC)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="card p-4 shadow-sm">
+            <div th:if="${selectedGame != null}">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold mb-0" th:text="${selectedGame.title} + ' Standings'">Valorant Standings</h4>
+                    <span class="badge bg-secondary" th:text="${selectedGame.genre}">FPS</span>
+                </div>
+
+                <div th:if="${#lists.isEmpty(leaderboard)}" class="text-center py-5">
+                    <div class="mb-3 text-muted">
+                        <i class="bi bi-people display-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">No players ranked yet</h5>
+                    <p class="text-muted mb-4">Be the first to record a match for this game!</p>
+                    <a th:href="@{/matches/new}" class="btn btn-navy btn-sm">Record Match</a>
+                </div>
+
+                <div class="table-responsive" th:unless="${#lists.isEmpty(leaderboard)}">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 70px;">Rank</th>
+                                <th>Player</th>
+                                <th class="text-center">Rating</th>
+                                <th class="text-center">Played</th>
+                                <th class="text-center text-success">W</th>
+                                <th class="text-center text-danger">L</th>
+                                <th class="text-center text-secondary">D</th>
+                                <th class="text-center">Win Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="entry : ${leaderboard}">
+                                <td>
+                                    <span th:if="${entry.rank == 1}" class="badge bg-warning text-dark fs-6"><i class="bi bi-award-fill"></i> 1</span>
+                                    <span th:if="${entry.rank == 2}" class="badge bg-secondary text-light fs-6"><i class="bi bi-award-fill"></i> 2</span>
+                                    <span th:if="${entry.rank == 3}" class="badge bg-dark text-light fs-6"><i class="bi bi-award-fill"></i> 3</span>
+                                    <span th:if="${entry.rank > 3}" class="fw-bold text-muted ps-2" th:text="'#' + ${entry.rank}">#4</span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark" th:text="${entry.playerName}">John Doe</div>
+                                    <small class="text-muted" th:text="${entry.playerEmail}">john@example.com</small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary fs-6" th:text="${entry.currentRating}">1200</span>
+                                </td>
+                                <td class="text-center fw-semibold" th:text="${entry.matchesPlayed}">10</td>
+                                <td class="text-center fw-bold text-success" th:text="${entry.wins}">7</td>
+                                <td class="text-center fw-bold text-danger" th:text="${entry.losses}">3</td>
+                                <td class="text-center fw-bold text-secondary" th:text="${entry.draws}">0</td>
+                                <td class="text-center">
+                                    <span class="fw-bold" th:text="${entry.winRate} + '%'">70.0%</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div th:if="${selectedGame == null}" class="text-center py-5">
+                <div class="mb-3 text-muted">
+                    <i class="bi bi-controller display-4"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No games found</h5>
+                <p class="text-muted">Please add or activate games in the catalog.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
