@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Points & History')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-5">
+                <div class="card p-4 shadow-sm border-secondary h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="text-secondary text-uppercase small fw-bold">Loyalty Balance</span>
+                        <div class="my-2">
+                            <span class="display-3 fw-bold text-warning" th:text="${balance}">0</span>
+                            <span class="fs-4 text-light ms-1">pts</span>
+                        </div>
+                        <p class="text-secondary small mb-3">
+                            Points are earned from station gaming hours, community events, and adjustments.
+                        </p>
+                    </div>
+                    <div>
+                        <a th:href="@{/rewards}" class="btn btn-accent btn-sm">Browse Rewards Catalog</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-7">
+                <div class="card p-4 shadow-sm border-secondary h-100">
+                    <h5 class="card-title text-info mb-3">About Points</h5>
+                    <ul class="text-secondary small mb-0 ps-3">
+                        <li class="mb-2"><strong>Earn on Bookings:</strong> Every confirmed gaming session earns reward points.</li>
+                        <li class="mb-2"><strong>Redemptions:</strong> Spend your points on gaming hours, drinks, and merchandise.</li>
+                        <li><strong>Transparent Ledger:</strong> Every points change is recorded in your ledger below.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 shadow-sm border-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="card-title mb-0">Points Ledger History</h5>
+                <span class="badge bg-secondary" th:text="${history.size()} + ' transactions'">0 transactions</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(history)}" class="alert alert-secondary text-center my-3">
+                <p class="mb-0">No points transactions recorded yet.</p>
+            </div>
+
+            <div class="table-responsive" th:unless="${#lists.isEmpty(history)}">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Transaction Type</th>
+                            <th>Description</th>
+                            <th class="text-end">Points Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="entry : ${history}">
+                            <td class="text-secondary small" th:text="${#temporals.format(entry.createdAt, 'yyyy-MM-dd HH:mm')}">2026-11-19 10:00</td>
+                            <td>
+                                <span th:if="${entry.transactionType == 'EARNED_BOOKING'}" class="badge bg-success">EARNED_BOOKING</span>
+                                <span th:if="${entry.transactionType == 'REWARD_REDEMPTION'}" class="badge bg-warning text-dark">REWARD_REDEMPTION</span>
+                                <span th:if="${entry.transactionType == 'ADJUSTMENT'}" class="badge bg-info text-dark">ADJUSTMENT</span>
+                            </td>
+                            <td>
+                                <span th:text="${entry.description} ?: '-'">Transaction description</span>
+                                <span th:if="${entry.booking != null}" class="badge bg-secondary ms-1" th:text="'Booking #' + ${entry.booking.id}">Booking #1</span>
+                                <span th:if="${entry.reward != null}" class="badge bg-secondary ms-1" th:text="'Reward: ' + ${entry.reward.name}">Reward</span>
+                            </td>
+                            <td class="text-end fw-bold">
+                                <span th:if="${entry.pointsChange > 0}" class="text-success" th:text="'+' + ${entry.pointsChange}">+100</span>
+                                <span th:if="${entry.pointsChange < 0}" class="text-danger" th:text="${entry.pointsChange}">-25</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

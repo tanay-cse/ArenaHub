@@ -24,6 +24,9 @@
                             <a class="nav-link" th:href="@{/bookings}">My Bookings</a>
                         </li>
                         <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" th:href="@{/points}">My Points</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
                             <a class="nav-link" th:href="@{/rewards}">Rewards</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('STAFF')">
