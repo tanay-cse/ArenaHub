@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Tournaments')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="h2 mb-1">Esports Tournaments</h1>
+                <p class="text-secondary mb-0">Join campus tournaments, challenge fellow gamers, and compete for the prize pool.</p>
+            </div>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/tournaments/new}" class="btn btn-accent">Create New Tournament</a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(tournaments)}" class="alert alert-secondary text-center my-5">
+            <h5 class="alert-heading">No Tournaments Scheduled</h5>
+            <p class="mb-0">There are currently no upcoming tournaments. Check back soon!</p>
+        </div>
+
+        <div class="row g-4" th:unless="${#lists.isEmpty(tournaments)}">
+            <div class="col-md-6 col-lg-4" th:each="t : ${tournaments}">
+                <div class="card h-100 shadow-sm border-secondary d-flex flex-column">
+                    <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
+                        <span class="badge bg-secondary" th:text="${t.game.title}">Game</span>
+                        <span th:if="${t.status == 'REGISTRATION_OPEN'}" class="badge bg-success">REGISTRATION OPEN</span>
+                        <span th:if="${t.status == 'ANNOUNCED'}" class="badge bg-info text-dark">ANNOUNCED</span>
+                        <span th:if="${t.status == 'IN_PROGRESS'}" class="badge bg-warning text-dark">IN PROGRESS</span>
+                        <span th:if="${t.status == 'COMPLETED'}" class="badge bg-secondary">COMPLETED</span>
+                        <span th:if="${t.status == 'CANCELLED'}" class="badge bg-danger">CANCELLED</span>
+                    </div>
+
+                    <div class="card-body flex-grow-1">
+                        <h5 class="card-title text-info fw-bold mb-3" th:text="${t.name}">Tournament Name</h5>
+
+                        <div class="mb-2 d-flex justify-content-between small">
+                            <span class="text-secondary">Format:</span>
+                            <span class="fw-semibold text-light" th:text="${t.format}">SINGLE_ELIMINATION</span>
+                        </div>
+                        <div class="mb-2 d-flex justify-content-between small">
+                            <span class="text-secondary">Start Time:</span>
+                            <span class="fw-semibold text-light" th:text="${#temporals.format(t.startTime, 'yyyy-MM-dd HH:mm')}">2026-11-26 18:00</span>
+                        </div>
+                        <div class="mb-2 d-flex justify-content-between small">
+                            <span class="text-secondary">Participants:</span>
+                            <span class="fw-bold text-light">
+                                <span th:text="${t.players.size()}">0</span> / <span th:text="${t.maxParticipants}">16</span>
+                                <span th:if="${t.players.size() >= t.maxParticipants}" class="badge bg-danger ms-1">FULL</span>
+                            </span>
+                        </div>
+                        <div class="mb-2 d-flex justify-content-between small">
+                            <span class="text-secondary">Prize Pool:</span>
+                            <span class="fw-bold text-warning" th:text="'₹' + ${t.prizePool}">₹250.00</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between small">
+                            <span class="text-secondary">Entry Fee:</span>
+                            <span class="fw-semibold text-light" th:text="${t.entryFee > 0} ? ('₹' + ${t.entryFee}) : 'Free'">Free</span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-secondary pt-0">
+                        <!-- Joined badge -->
+                        <div th:if="${joinedTournamentIds.contains(t.id)}" class="text-center py-1">
+                            <span class="badge bg-success w-100 py-2 fs-6">Registered</span>
+                        </div>
+
+                        <!-- Open registration and not joined -->
+                        <div th:unless="${joinedTournamentIds.contains(t.id)}">
+                            <form th:if="${t.status == 'REGISTRATION_OPEN' and t.players.size() < t.maxParticipants}"
+                                  th:action="@{/tournaments/{id}/join(id=${t.id})}" method="post">
+                                <button type="submit" class="btn btn-accent w-100">Join Tournament</button>
+                            </form>
+                            <button th:if="${t.status == 'REGISTRATION_OPEN' and t.players.size() >= t.maxParticipants}"
+                                    class="btn btn-outline-danger w-100" disabled>Tournament Full</button>
+                            <button th:if="${t.status != 'REGISTRATION_OPEN'}"
+                                    class="btn btn-outline-secondary w-100" disabled
+                                    th:text="${t.status == 'ANNOUNCED'} ? 'Registration Coming Soon' : 'Registration Closed'">
+                                Registration Closed
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
