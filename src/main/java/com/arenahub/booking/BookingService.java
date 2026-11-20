@@ -1,17 +1,21 @@
 package com.arenahub.booking;
 
+import com.arenahub.audit.AuditService;
 import com.arenahub.auth.User;
 import com.arenahub.auth.UserRepository;
 import com.arenahub.catalog.Station;
 import com.arenahub.catalog.StationRepository;
 import com.arenahub.loyalty.LoyaltyService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookingService {
@@ -22,19 +26,25 @@ public class BookingService {
     private final WaitlistService waitlistService;
     private final PricingService pricingService;
     private final LoyaltyService loyaltyService;
+    private final AuditService auditService;
+    private final ObjectMapper objectMapper;
 
     public BookingService(BookingRepository bookingRepository,
                           StationRepository stationRepository,
                           UserRepository userRepository,
                           WaitlistService waitlistService,
                           PricingService pricingService,
-                          LoyaltyService loyaltyService) {
+                          LoyaltyService loyaltyService,
+                          AuditService auditService,
+                          ObjectMapper objectMapper) {
         this.bookingRepository = bookingRepository;
         this.stationRepository = stationRepository;
         this.userRepository = userRepository;
         this.waitlistService = waitlistService;
         this.pricingService = pricingService;
         this.loyaltyService = loyaltyService;
+        this.auditService = auditService;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional(readOnly = true)
@@ -127,6 +137,7 @@ public class BookingService {
             throw new BookingNotCancellableException("Booking is already " + booking.getStatus() + ".");
         }
 
+        String oldStatus = booking.getStatus();
         booking.setStatus("CANCELLED");
         Booking saved = bookingRepository.save(booking);
 
@@ -134,6 +145,8 @@ public class BookingService {
         LocalDate date = booking.getStartTime().toLocalDate();
         int hour = booking.getStartTime().getHour();
         waitlistService.notifyNext(booking.getStation().getId(), date, hour);
+
+        auditService.log(requestingUserId, "CANCEL_BOOKING", "bookings", saved.getId(), toJson(Map.of("status", oldStatus)), toJson(Map.of("status", "CANCELLED")));
 
         return saved;
     }
@@ -189,6 +202,11 @@ public class BookingService {
             }
         }
 
+        Long oldStationId = booking.getStation().getId();
+        LocalDateTime oldStartTime = booking.getStartTime();
+        LocalDateTime oldEndTime = booking.getEndTime();
+        BigDecimal oldPrice = booking.getTotalPrice();
+
         booking.setStation(station);
         booking.setStartTime(normalizedStartTime);
         booking.setEndTime(normalizedEndTime);
@@ -209,6 +227,19 @@ public class BookingService {
                 saved
         );
 
+        auditService.log(requestingUserId, "RESCHEDULE_BOOKING", "bookings", saved.getId(),
+                toJson(Map.of("stationId", oldStationId, "startTime", oldStartTime.toString(), "endTime", oldEndTime.toString(), "totalPrice", oldPrice)),
+                toJson(Map.of("stationId", station.getId(), "startTime", normalizedStartTime.toString(), "endTime", normalizedEndTime.toString(), "totalPrice", saved.getTotalPrice())));
+
         return saved;
+    }
+
+    private String toJson(Object obj) {
+        if (obj == null) return null;
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

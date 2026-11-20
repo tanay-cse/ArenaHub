@@ -1,11 +1,14 @@
 package com.arenahub.loyalty;
 
+import com.arenahub.audit.AuditService;
 import com.arenahub.auth.User;
 import com.arenahub.auth.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -15,13 +18,19 @@ public class RewardService {
     private final RewardRepository rewardRepository;
     private final PointsLedgerRepository pointsLedgerRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
+    private final ObjectMapper objectMapper;
 
     public RewardService(RewardRepository rewardRepository,
                          PointsLedgerRepository pointsLedgerRepository,
-                         UserRepository userRepository) {
+                         UserRepository userRepository,
+                         AuditService auditService,
+                         ObjectMapper objectMapper) {
         this.rewardRepository = rewardRepository;
         this.pointsLedgerRepository = pointsLedgerRepository;
         this.userRepository = userRepository;
+        this.auditService = auditService;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional(readOnly = true)
@@ -112,10 +121,22 @@ public class RewardService {
             throw new InsufficientPointsException("Insufficient points: you have " + balance + " points, but this reward costs " + reward.getPointsCost() + " points.");
         }
 
+        int oldStock = reward.getStockQuantity();
         reward.setStockQuantity(reward.getStockQuantity() - 1);
         rewardRepository.save(reward);
 
         PointsLedger entry = new PointsLedger(user, null, reward, -reward.getPointsCost(), "REWARD_REDEMPTION", "Redeemed: " + reward.getName());
         pointsLedgerRepository.save(entry);
+
+        auditService.log(userId, "REDEEM_REWARD", "rewards", rewardId, toJson(Map.of("stockQuantity", oldStock, "pointsCost", reward.getPointsCost())), toJson(Map.of("stockQuantity", reward.getStockQuantity(), "pointsCost", reward.getPointsCost())));
+    }
+
+    private String toJson(Object obj) {
+        if (obj == null) return null;
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

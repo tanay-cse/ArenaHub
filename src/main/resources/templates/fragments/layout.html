@@ -58,6 +58,9 @@
                             <a class="nav-link" th:href="@{/admin}">Dashboard</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                            <a class="nav-link" th:href="@{/admin/users}">Users</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                             <a class="nav-link" th:href="@{/admin/rewards}">Manage Rewards</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
