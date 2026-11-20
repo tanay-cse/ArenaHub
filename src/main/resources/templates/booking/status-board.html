@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Arena Status Board')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="h2 mb-1"><i class="bi bi-display me-2 text-primary"></i>Live Arena Status Board</h1>
+                <p class="text-secondary mb-0">Real-time availability, active gaming sessions, and live countdowns.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill bg-dark text-light border px-3 py-2 small d-inline-flex align-items-center gap-2">
+                    <span class="spinner-grow spinner-grow-sm text-success" role="status" aria-hidden="true" style="width: 0.65rem; height: 0.65rem;"></span>
+                    <span>Live 15s Feed</span>
+                </span>
+                <a th:href="@{/bookings}" class="btn btn-navy btn-sm">Book a Station</a>
+            </div>
+        </div>
+
+        <!-- Station Cards Grid -->
+        <div class="row g-4" id="arena-status-board">
+            <div class="col-sm-6 col-lg-3" th:each="s : ${stations}">
+                <div class="card p-3 shadow-sm border-0 h-100" th:id="'station-card-' + ${s.stationId}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-secondary font-monospace" th:text="${s.stationType}">PC_VIP</span>
+                        <span th:class="'badge station-status-badge ' + (${s.status == 'AVAILABLE'} ? 'bg-success' : (${s.status == 'ACTIVE'} ? 'bg-danger' : 'bg-warning text-dark'))"
+                              th:text="${s.status}">AVAILABLE</span>
+                    </div>
+
+                    <div class="my-2">
+                        <h4 class="fw-bold mb-1 text-dark" th:text="${s.stationNumber}">ST-VIP-01</h4>
+                        <div class="text-muted small">
+                            Rate: <span class="fw-semibold text-dark" th:text="'₹' + ${s.hourlyRate} + '/hr'">₹150.00/hr</span>
+                        </div>
+                    </div>
+
+                    <div class="countdown-container my-3 p-2 rounded" style="background-color: var(--surface); min-height: 48px; display: flex; align-items: center;">
+                        <!-- ACTIVE Countdown -->
+                        <div th:if="${s.status == 'ACTIVE' and s.endTime != null}">
+                            <i class="bi bi-stopwatch text-danger me-1"></i>
+                            <span class="countdown-timer fw-bold font-monospace text-danger" th:attr="data-countdown-end=${s.endTime}">Calculating...</span>
+                        </div>
+                        <!-- AVAILABLE State -->
+                        <div th:if="${s.status == 'AVAILABLE'}">
+                            <span class="text-success small fw-medium"><i class="bi bi-check-circle me-1"></i>Ready for play</span>
+                        </div>
+                        <!-- MAINTENANCE State -->
+                        <div th:if="${s.status == 'MAINTENANCE'}">
+                            <span class="text-warning small fw-medium"><i class="bi bi-tools me-1"></i>Under maintenance</span>
+                        </div>
+                    </div>
+
+                    <div class="action-container mt-auto">
+                        <a th:if="${s.status == 'AVAILABLE'}" th:href="@{/bookings(stationId=${s.stationId})}" class="btn btn-navy btn-sm w-100">
+                            <i class="bi bi-calendar-plus me-1"></i>Book Station
+                        </a>
+                        <a th:if="${s.status == 'ACTIVE'}" th:href="@{/waitlist}" class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="bi bi-hourglass-split me-1"></i>Join Waitlist
+                        </a>
+                        <button th:if="${s.status == 'MAINTENANCE'}" class="btn btn-secondary btn-sm w-100" disabled>
+                            <i class="bi bi-slash-circle me-1"></i>Unavailable
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -5,106 +5,216 @@
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
 
-    <main class="container my-5 flex-grow-1">
-        <div class="mb-4">
-            <a th:href="@{/stations}" class="btn btn-outline-dark btn-sm mb-3">
+    <main class="container my-5 flex-grow-1" id="availability-view-container"
+          th:attr="data-station-id=${station.id}, data-station-number=${station.stationNumber}, data-station-type=${station.stationType}, data-hourly-rate=${station.hourlyRate}, data-selected-date=${#temporals.format(date, 'yyyy-MM-dd')}">
+
+        <!-- Top Navigation & Station-Type Tab Strip -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <a th:href="@{/stations}" class="btn btn-outline-dark btn-sm">
                 <i class="bi bi-arrow-left me-1"></i>Back to All Stations
             </a>
-            <div class="card p-4 shadow-sm border-0">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <h1 class="h2 mb-0" th:text="${station.stationNumber}">ST-VIP-01</h1>
-                            <span th:class="'badge ' + (${station.status == 'AVAILABLE'} ? 'bg-success' : (${station.status == 'OCCUPIED'} ? 'bg-danger' : 'bg-warning text-dark'))"
-                                  th:text="${station.status}">AVAILABLE</span>
-                        </div>
-                        <p class="text-secondary mb-0">
-                            <span class="fw-semibold text-dark" th:text="${station.stationType}">PC_VIP</span>
-                            &middot;
-                            <span class="fw-bold text-dark" th:text="'₹' + ${station.hourlyRate} + '/hr'">₹150.00/hr</span>
-                        </p>
-                    </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/bookings/new(stationId=${station.id})}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-calendar-plus me-1"></i>Booking Wizard
+                </a>
+            </div>
+        </div>
 
-                    <form method="get" th:action="@{/stations/{id}/availability(id=${station.id})}" class="d-flex align-items-center gap-2 flex-wrap">
-                        <a th:href="@{/stations/{id}/availability(id=${station.id}, date=${#temporals.format(date.minusDays(1), 'yyyy-MM-dd')})}"
-                           class="btn btn-outline-dark btn-sm">
-                            <i class="bi bi-chevron-left"></i> Prev
-                        </a>
-                        <input type="date" name="date" class="form-control form-control-sm w-auto"
-                               th:value="${#temporals.format(date, 'yyyy-MM-dd')}" onchange="this.form.submit()">
-                        <button type="submit" class="btn btn-navy btn-sm">View</button>
-                        <a th:href="@{/stations/{id}/availability(id=${station.id}, date=${#temporals.format(date.plusDays(1), 'yyyy-MM-dd')})}"
-                           class="btn btn-outline-dark btn-sm">
-                            Next <i class="bi bi-chevron-right"></i>
-                        </a>
-                        <a th:href="@{/stations/{id}/availability(id=${station.id})}" class="btn btn-outline-secondary btn-sm">Today</a>
-                    </form>
+        <!-- Station Overview Card -->
+        <div class="card p-4 shadow-sm mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h1 class="h2 mb-0" th:text="${station.stationNumber}">ST-VIP-01</h1>
+                        <span th:class="'badge ' + (${station.status == 'AVAILABLE'} ? 'bg-success' : (${station.status == 'OCCUPIED'} ? 'bg-danger' : 'bg-warning text-dark'))"
+                              th:text="${station.status}">AVAILABLE</span>
+                    </div>
+                    <p class="text-secondary mb-0">
+                        <span class="fw-semibold text-dark" th:text="${station.stationType}">PC_VIP</span>
+                        &middot;
+                        <span class="fw-bold text-dark" th:text="'₹' + ${station.hourlyRate} + '/hr'">₹150.00/hr</span>
+                    </p>
+                </div>
+
+                <!-- Station-Type Navigation Tabs -->
+                <div>
+                    <ul class="nav nav-pills gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link btn-sm px-3 rounded-pill" th:href="@{/stations}"
+                               th:classappend="${station.stationType == null} ? 'active' : ''">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-sm px-3 rounded-pill" th:href="@{/stations}"
+                               th:classappend="${station.stationType == 'PC_VIP'} ? 'active' : ''">PC VIP</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-sm px-3 rounded-pill" th:href="@{/stations}"
+                               th:classappend="${station.stationType == 'PC_STANDARD'} ? 'active' : ''">PC Standard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-sm px-3 rounded-pill" th:href="@{/stations}"
+                               th:classappend="${station.stationType == 'PS5'} ? 'active' : ''">PS5</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-sm px-3 rounded-pill" th:href="@{/stations}"
+                               th:classappend="${station.stationType == 'SIMULATOR'} ? 'active' : ''">Simulator</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="card p-4 shadow-sm border-0">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 pb-2 border-bottom">
-                <div>
-                    <h5 class="mb-1">Time Slot Grid (10:00 – 21:00)</h5>
-                    <div class="text-muted small" th:text="'Showing availability for ' + ${#temporals.format(date, 'EEEE, MMMM dd, yyyy')}">Showing availability for Nov 29, 2026</div>
-                </div>
+        <!-- Horizontal 7-Day Date Strip -->
+        <div class="card p-4 shadow-sm mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h5 class="mb-0">Select Date</h5>
+                <!-- Prev / Next / Date picker controls -->
+                <form method="get" th:action="@{/stations/{id}/availability(id=${station.id})}" class="d-flex align-items-center gap-2 flex-wrap">
+                    <a th:href="@{/stations/{id}/availability(id=${station.id}, date=${#temporals.format(date.minusDays(1), 'yyyy-MM-dd')})}"
+                       class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <input type="date" name="date" class="form-control form-control-sm w-auto"
+                           th:value="${#temporals.format(date, 'yyyy-MM-dd')}" onchange="this.form.submit()">
+                    <a th:href="@{/stations/{id}/availability(id=${station.id}, date=${#temporals.format(date.plusDays(1), 'yyyy-MM-dd')})}"
+                       class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a th:href="@{/stations/{id}/availability(id=${station.id})}" class="btn btn-outline-secondary btn-sm">Today</a>
+                </form>
+            </div>
 
-                <div class="d-flex flex-wrap gap-3 small align-items-center">
-                    <span class="d-inline-flex align-items-center gap-1">
-                        <span class="badge bg-success rounded-pill">&nbsp;</span>
-                        <span class="text-secondary">AVAILABLE (Click to book)</span>
-                    </span>
-                    <span class="d-inline-flex align-items-center gap-1">
-                        <span class="badge bg-danger rounded-pill">&nbsp;</span>
-                        <span class="text-secondary">BOOKED</span>
-                    </span>
-                    <span class="d-inline-flex align-items-center gap-1">
-                        <span class="badge bg-warning rounded-pill">&nbsp;</span>
-                        <span class="text-secondary">MAINTENANCE</span>
-                    </span>
-                    <span class="d-inline-flex align-items-center gap-1">
-                        <span class="badge bg-secondary rounded-pill">&nbsp;</span>
-                        <span class="text-secondary">PAST</span>
-                    </span>
+            <!-- 7-day strip -->
+            <div class="date-strip" id="availability-date-strip">
+                <!-- Dynamically rendered 7 days linking to this station's availability -->
+            </div>
+        </div>
+
+        <!-- Main Content: Slot Chips Grid + Booking Summary Card -->
+        <div class="row g-4">
+            <!-- Left: Hourly Slot Chips with 3-State Legend -->
+            <div class="col-lg-8">
+                <div class="card p-4 shadow-sm h-100">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 pb-2 border-bottom">
+                        <div>
+                            <h5 class="mb-1">Time Slot Grid (10:00 – 21:00)</h5>
+                            <div class="text-muted small" th:text="'Availability for ' + ${#temporals.format(date, 'EEEE, MMMM dd, yyyy')}">Showing availability</div>
+                        </div>
+
+                        <!-- 3-State Legend -->
+                        <div class="d-flex flex-wrap gap-3 small align-items-center">
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <span class="badge bg-success rounded-pill">&nbsp;</span>
+                                <span class="text-secondary">Available</span>
+                            </span>
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <span class="badge bg-danger rounded-pill">&nbsp;</span>
+                                <span class="text-secondary">Booked</span>
+                            </span>
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <span class="badge bg-dark rounded-pill">&nbsp;</span>
+                                <span class="text-secondary">Selected</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Slot Chips Grid -->
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+                        <div class="col" th:each="slot : ${slots}">
+                            <!-- AVAILABLE (clickable chip that selects slot and updates summary) -->
+                            <div th:if="${slot.status == 'AVAILABLE'}"
+                                 class="slot-chip slot-available h-100"
+                                 th:attr="data-hour=${slot.hour}, data-time-label=${slot.timeLabel}, data-status='AVAILABLE'">
+                                <span class="fs-6 fw-bold text-dark mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
+                                <span class="badge bg-success">AVAILABLE</span>
+                                <small class="text-success mt-2 fw-semibold slot-action-text"><i class="bi bi-hand-index me-1"></i>Select</small>
+                            </div>
+
+                            <!-- BOOKED (disabled chip) -->
+                            <div th:if="${slot.status == 'BOOKED'}"
+                                 class="slot-chip slot-booked h-100"
+                                 th:attr="data-hour=${slot.hour}, data-status='BOOKED'">
+                                <span class="fs-6 fw-bold mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
+                                <span class="badge bg-danger">BOOKED</span>
+                                <small class="text-danger mt-2">Reserved</small>
+                            </div>
+
+                            <!-- MAINTENANCE (disabled chip) -->
+                            <div th:if="${slot.status == 'MAINTENANCE'}"
+                                 class="slot-chip slot-maintenance h-100"
+                                 th:attr="data-hour=${slot.hour}, data-status='MAINTENANCE'">
+                                <span class="fs-6 fw-bold mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
+                                <span class="badge bg-warning text-dark">MAINTENANCE</span>
+                                <small class="text-secondary mt-2">Offline</small>
+                            </div>
+
+                            <!-- PAST (disabled chip) -->
+                            <div th:if="${slot.status == 'PAST'}"
+                                 class="slot-chip slot-past h-100"
+                                 th:attr="data-hour=${slot.hour}, data-status='PAST'">
+                                <span class="fs-6 fw-bold text-muted mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
+                                <span class="badge bg-secondary">PAST</span>
+                                <small class="text-muted mt-2">Past</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
-                <div class="col" th:each="slot : ${slots}">
-                    <!-- AVAILABLE (clickable chip) -->
-                    <a th:if="${slot.status == 'AVAILABLE'}"
-                       th:href="@{/bookings/new(stationId=${station.id}, date=${#temporals.format(date, 'yyyy-MM-dd')}, hour=${slot.hour})}"
-                       class="card h-100 p-3 text-center text-decoration-none border-success border-2 shadow-sm d-flex flex-column align-items-center justify-content-center bg-white"
-                       title="Click to reserve slot">
-                        <span class="fs-6 fw-bold text-dark mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
-                        <span class="badge bg-success">AVAILABLE</span>
-                        <small class="text-success mt-2 fw-semibold"><i class="bi bi-calendar-plus me-1"></i>Book Slot</small>
-                    </a>
+            <!-- Right: Booking Summary Card -->
+            <div class="col-lg-4">
+                <div class="card p-4 shadow-sm sticky-top" style="top: 2rem;">
+                    <h4 class="card-title mb-3 pb-2 border-bottom">Booking Summary</h4>
 
-                    <!-- BOOKED (red, disabled) -->
-                    <div th:if="${slot.status == 'BOOKED'}"
-                         class="card h-100 p-3 text-center border-danger border shadow-sm d-flex flex-column align-items-center justify-content-center bg-light">
-                        <span class="fs-6 fw-bold text-dark mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
-                        <span class="badge bg-danger">BOOKED</span>
-                        <small class="text-danger mt-2">Reserved</small>
-                    </div>
+                    <form th:action="@{/bookings}" method="post" id="avail-booking-form">
+                        <input type="hidden" name="stationId" th:value="${station.id}"/>
+                        <input type="hidden" name="startTime" id="avail-startTime-input" value="" required/>
 
-                    <!-- MAINTENANCE (amber, disabled) -->
-                    <div th:if="${slot.status == 'MAINTENANCE'}"
-                         class="card h-100 p-3 text-center border-warning border shadow-sm d-flex flex-column align-items-center justify-content-center bg-light">
-                        <span class="fs-6 fw-bold text-dark mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
-                        <span class="badge bg-warning text-dark">MAINTENANCE</span>
-                        <small class="text-secondary mt-2">Offline</small>
-                    </div>
+                        <div class="mb-3">
+                            <small class="text-secondary d-block">Station</small>
+                            <span class="fw-bold fs-6 text-dark" th:text="${station.stationNumber} + ' (' + ${station.stationType} + ')'">ST-VIP-01 (PC_VIP)</span>
+                        </div>
 
-                    <!-- PAST (grey, not clickable) -->
-                    <div th:if="${slot.status == 'PAST'}"
-                         class="card h-100 p-3 text-center border shadow-sm d-flex flex-column align-items-center justify-content-center bg-light opacity-75">
-                        <span class="fs-6 fw-bold text-muted mb-1" th:text="${slot.timeLabel}">10:00 – 11:00</span>
-                        <span class="badge bg-secondary">PAST</span>
-                        <small class="text-muted mt-2">Past</small>
-                    </div>
+                        <div class="mb-3">
+                            <small class="text-secondary d-block">Date</small>
+                            <span class="fw-bold text-dark" th:text="${#temporals.format(date, 'EEEE, MMM dd, yyyy')}">Nov 20, 2026</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-secondary d-block">Time Slot (1 Hour)</small>
+                            <span class="fw-bold text-dark" id="avail-summary-time">Click an available slot</span>
+                        </div>
+
+                        <hr class="my-3 border-secondary-subtle">
+
+                        <!-- Pricing Breakdown -->
+                        <div class="mb-2 d-flex justify-content-between text-secondary small">
+                            <span>Base Rate:</span>
+                            <span th:text="'₹' + ${station.hourlyRate} + '/hr'">₹150.00/hr</span>
+                        </div>
+                        <div class="mb-2 d-flex justify-content-between text-secondary small">
+                            <span id="avail-rule-label">Rate Adjustment:</span>
+                            <span id="avail-multiplier">-</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between text-secondary small">
+                            <span>Member Discount:</span>
+                            <span class="text-success fw-medium">10% OFF (0.9x)</span>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 mb-4 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark fs-6">Estimated Total</span>
+                            <span class="fw-bold fs-4 text-dark" id="avail-total-price">₹0.00</span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" id="avail-confirm-btn" class="btn btn-navy btn-lg" disabled>
+                                Confirm Booking
+                            </button>
+                        </div>
+                        <div class="text-center text-muted small mt-2">
+                            <i class="bi bi-shield-check me-1"></i>Guaranteed 1-hour session
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

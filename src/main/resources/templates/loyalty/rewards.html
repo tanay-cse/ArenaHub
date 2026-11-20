@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Rewards Catalog')}"></head>
+<head th:replace="~{fragments/layout :: head('Loyalty Rewards - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
@@ -9,43 +9,78 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div>
                 <h1 class="h2 mb-1">Loyalty Rewards</h1>
-                <p class="text-secondary mb-0">Redeem your hard-earned points for arena perks, free game time, and merchandise.</p>
+                <p class="text-secondary mb-0">Redeem points earned from bookings and tournaments for free game time and gear.</p>
             </div>
             <div class="d-flex align-items-center gap-2">
                 <span th:if="${userBalance != null}" class="badge bg-warning text-dark px-3 py-2 fs-6">
                     <i class="bi bi-star-fill me-1"></i>Your Balance: <strong th:text="${userBalance} + ' pts'">0 pts</strong>
                 </span>
+                <a th:href="@{/points}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-journal-text me-1"></i>Points Ledger
+                </a>
             </div>
         </div>
 
-        <div th:if="${#lists.isEmpty(rewards)}" class="alert alert-secondary text-center my-5">
-            <h5 class="alert-heading">No Rewards Currently Available</h5>
-            <p class="mb-0">Check back soon for new prizes and rewards!</p>
+        <!-- Friendly Empty State -->
+        <div th:if="${#lists.isEmpty(rewards)}" class="card p-5 text-center shadow-sm border-0 my-4">
+            <div class="mb-3 text-muted">
+                <i class="bi bi-gift display-3"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Rewards Currently Available</h4>
+            <p class="text-muted mb-4">New reward prizes and arena perks are being stocked. Check back soon!</p>
+            <div>
+                <a th:href="@{/bookings}" class="btn btn-navy btn-sm">Play Games to Earn Points</a>
+            </div>
         </div>
 
-        <div class="row g-4" th:unless="${#lists.isEmpty(rewards)}">
-            <div class="col-md-6 col-lg-3" th:each="reward : ${rewards}">
-                <div class="card h-100 shadow-sm border-secondary d-flex flex-column">
-                    <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
-                        <span class="badge bg-warning text-dark fw-bold fs-6" th:text="${reward.pointsCost} + ' pts'">100 pts</span>
-                        <span th:if="${reward.stockQuantity > 0}" class="badge bg-success" th:text="${reward.stockQuantity} + ' left'">50 left</span>
-                        <span th:unless="${reward.stockQuantity > 0}" class="badge bg-danger">Out of stock</span>
+        <!-- Plan-Style Reward Cards Grid -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 pt-2" th:unless="${#lists.isEmpty(rewards)}">
+            <div class="col" th:each="reward, rewardStat : ${rewards}">
+                <div class="card reward-plan-card h-100 d-flex flex-column p-4"
+                     th:classappend="${rewardStat.index == 1} ? 'featured' : ''">
+
+                    <!-- Highlighted "Most Popular" Ribbon on second reward -->
+                    <div th:if="${rewardStat.index == 1}" class="popular-ribbon">
+                        <i class="bi bi-star-fill me-1"></i>Most Popular
                     </div>
-                    <div class="card-body flex-grow-1">
-                        <h5 class="card-title text-info fw-bold mb-2" th:text="${reward.name}">Reward Name</h5>
-                        <p class="card-text text-secondary small" th:text="${reward.description} ?: 'No description provided.'">Description</p>
+
+                    <!-- Points Price Tag (Plan Style) -->
+                    <div class="text-center py-3 mb-3 border-bottom">
+                        <div class="d-flex align-items-baseline justify-content-center gap-1">
+                            <span class="display-5 fw-bold text-dark" th:text="${reward.pointsCost}">100</span>
+                            <span class="text-secondary fw-semibold">pts</span>
+                        </div>
+                        <div class="mt-2">
+                            <span th:if="${reward.stockQuantity > 0}" class="badge bg-success"
+                                  th:text="${reward.stockQuantity} + ' available'">50 available</span>
+                            <span th:unless="${reward.stockQuantity > 0}" class="badge bg-danger">
+                                Out of stock
+                            </span>
+                        </div>
                     </div>
-                    <div class="card-footer bg-transparent border-secondary pt-0">
+
+                    <!-- Reward Body -->
+                    <div class="flex-grow-1 text-center mb-4">
+                        <h5 class="fw-bold text-dark mb-2" th:text="${reward.name}">Free Hour Pass</h5>
+                        <p class="text-secondary small mb-0" th:text="${reward.description} ?: 'No description provided.'">
+                            Enjoy one complimentary hour on any standard gaming station.
+                        </p>
+                    </div>
+
+                    <!-- Preserved Week 2 Redeem Flow -->
+                    <div class="pt-2">
                         <form th:if="${reward.stockQuantity > 0}"
                               th:action="@{/rewards/{id}/redeem(id=${reward.id})}"
                               method="post"
                               th:data-confirm="|Are you sure you want to redeem ${reward.name} for ${reward.pointsCost} points?|"
                               onsubmit="return confirm(this.getAttribute('data-confirm'));">
-                            <button type="submit" class="btn btn-accent w-100 btn-sm">
-                                <i class="bi bi-gift me-1"></i>Redeem
+                            <button type="submit"
+                                    class="btn w-100"
+                                    th:classappend="${rewardStat.index == 1} ? 'btn-accent' : 'btn-navy'">
+                                <i class="bi bi-gift me-1"></i>Redeem Reward
                             </button>
                         </form>
-                        <button th:unless="${reward.stockQuantity > 0}" class="btn btn-outline-secondary w-100 btn-sm" disabled>
+                        <button th:unless="${reward.stockQuantity > 0}" class="btn btn-outline-secondary w-100" disabled>
                             Out of Stock
                         </button>
                     </div>

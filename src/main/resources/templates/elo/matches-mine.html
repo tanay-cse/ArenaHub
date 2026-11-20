@@ -9,7 +9,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div>
                 <h2 class="fw-bold mb-1"><i class="bi bi-controller text-primary me-2"></i>My Match History</h2>
-                <p class="text-muted mb-0">Track your past matches, outcomes, rating changes, and active streaks.</p>
+                <p class="text-muted mb-0">Track your past matches, rating trajectory, active streaks, and earned achievements.</p>
             </div>
             <div>
                 <a th:href="@{/matches/new}" class="btn btn-accent btn-sm">
@@ -42,6 +42,69 @@
                         <i class="bi bi-dash me-1"></i> <span th:text="${streak.display}">No streak</span>
                     </span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Earned Badges Showcase -->
+        <div class="card p-4 shadow-sm mb-4 border-0">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h5 class="fw-bold mb-1"><i class="bi bi-award-fill text-warning me-2"></i>Earned Badges</h5>
+                    <small class="text-muted">Achievements unlocked through arena victories and competitive excellence</small>
+                </div>
+                <span class="badge bg-dark text-light px-3 py-2 border">
+                    <span th:text="${#lists.size(userBadges)}">0</span> Unlocked
+                </span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(userBadges)}" class="text-center py-4 bg-light rounded">
+                <i class="bi bi-trophy display-6 text-muted mb-2 d-block"></i>
+                <span class="text-muted small">No badges unlocked yet. Compete and win matches to earn your first badge!</span>
+            </div>
+
+            <div class="row g-3" th:unless="${#lists.isEmpty(userBadges)}">
+                <div class="col-md-4" th:each="b : ${userBadges}">
+                    <div class="card p-3 border h-100 shadow-sm" style="background-color: var(--surface);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center p-3"
+                                 style="width: 50px; height: 50px; background-color: rgba(24, 103, 210, 0.1);">
+                                <i th:class="'bi ' + ${b.icon} + ' fs-4 text-primary'"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark" th:text="${b.name}">First Victory</h6>
+                                <small class="text-muted d-block" th:text="${b.description}">Achieved first match victory</small>
+                                <small class="text-secondary fst-italic" th:text="'Earned: ' + ${#temporals.format(b.earnedAt, 'MMM dd, yyyy')}">Earned Nov 20, 2026</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating History Graph (Chart.js Line Chart) -->
+        <div class="card p-4 shadow-sm mb-4 border-0">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h5 class="fw-bold mb-1"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Rating Progression Over Time</h5>
+                    <small class="text-muted">Cumulative ELO trajectory starting from the 1200 baseline</small>
+                </div>
+                <div th:if="${not #lists.isEmpty(ratingHistories) and #lists.size(ratingHistories) > 1}">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="gameChartSelector" class="small fw-semibold text-muted mb-0">Game:</label>
+                        <select id="gameChartSelector" class="form-select form-select-sm" onchange="updateChartGame(this.value)">
+                            <option th:each="h : ${ratingHistories}" th:value="${h.gameId}" th:text="${h.gameTitle}">Valorant</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(ratingHistories)}" class="text-center py-4 bg-light rounded">
+                <i class="bi bi-graph-up display-6 text-muted mb-2 d-block"></i>
+                <span class="text-muted small">No rated matches played yet. Play a match to start tracking your rating over time!</span>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(ratingHistories)}" style="position: relative; height: 320px; width: 100%;">
+                <canvas id="ratingHistoryChart"></canvas>
             </div>
         </div>
 
@@ -113,5 +176,63 @@
     </main>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const ratingHistories = /*[[${ratingHistories}]]*/ [];
+        if (ratingHistories && ratingHistories.length > 0) {
+            let currentHistory = ratingHistories[0];
+            const ctx = document.getElementById('ratingHistoryChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: currentHistory.labels,
+                    datasets: [{
+                        label: currentHistory.gameTitle + ' Rating',
+                        data: currentHistory.ratings,
+                        borderColor: '#1867D2',
+                        backgroundColor: 'rgba(24, 103, 210, 0.12)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Rating: ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            window.updateChartGame = function(gameId) {
+                const hist = ratingHistories.find(h => String(h.gameId) === String(gameId));
+                if (hist) {
+                    chart.data.labels = hist.labels;
+                    chart.data.datasets[0].label = hist.gameTitle + ' Rating';
+                    chart.data.datasets[0].data = hist.ratings;
+                    chart.update();
+                }
+            };
+        }
+        /*]]>*/
+    </script>
 </body>
 </html>

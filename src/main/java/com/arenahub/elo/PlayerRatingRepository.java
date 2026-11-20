@@ -13,6 +13,9 @@ public interface PlayerRatingRepository extends JpaRepository<PlayerRating, Long
 
     Optional<PlayerRating> findByUserIdAndGameId(Long userId, Long gameId);
 
+    @Query("SELECT COUNT(pr) FROM PlayerRating pr WHERE pr.game.id = :gameId AND pr.currentRating > :rating")
+    long countPlayersWithHigherRating(@Param("gameId") Long gameId, @Param("rating") int rating);
+
     @Query(value = """
         SELECT 
             u.id,

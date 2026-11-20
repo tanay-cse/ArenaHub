@@ -93,6 +93,7 @@ public class BookingService {
         booking.setEndTime(normalizedEndTime);
         booking.setStatus("CONFIRMED");
         booking.setTotalPrice(pricingService.calculatePrice(stationId, normalizedStartTime.getHour()));
+        booking.setCheckinCode(generateCheckinCode());
 
         Booking saved;
         try {
@@ -232,6 +233,56 @@ public class BookingService {
                 toJson(Map.of("stationId", station.getId(), "startTime", normalizedStartTime.toString(), "endTime", normalizedEndTime.toString(), "totalPrice", saved.getTotalPrice())));
 
         return saved;
+    }
+
+    @Transactional
+    public Booking checkin(String code, Long requestingUserId) {
+        if (code == null || code.trim().isEmpty()) {
+            throw new IllegalArgumentException("Check-in code must not be empty.");
+        }
+        Booking booking = bookingRepository.findByCheckinCode(code.trim().toUpperCase())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid check-in code. No matching reservation found."));
+
+        if (booking.getCheckedInAt() != null) {
+            throw new IllegalStateException("Booking #" + booking.getId() + " has already been checked in at "
+                    + booking.getCheckedInAt().toLocalTime().toString().substring(0, 5) + ".");
+        }
+
+        String status = booking.getStatus();
+        if (!"CONFIRMED".equalsIgnoreCase(status) && !"ACTIVE".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("Cannot check in: reservation is currently " + status + ".");
+        }
+
+        LocalDate today = LocalDate.now();
+        if (!booking.getStartTime().toLocalDate().isEqual(today)) {
+            throw new IllegalStateException("Check-in is only available on the day of reservation ("
+                    + booking.getStartTime().toLocalDate() + ").");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        booking.setCheckedInAt(now);
+        Booking updated = bookingRepository.save(booking);
+
+        auditService.log(requestingUserId, "BOOKING_CHECKIN", "bookings", updated.getId(),
+                null, toJson(Map.of("checkinCode", code.trim().toUpperCase(), "checkedInAt", now.toString())));
+
+        return updated;
+    }
+
+    private String generateCheckinCode() {
+        String characters = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        for (int i = 0; i < 20; i++) {
+            StringBuilder sb = new StringBuilder(10);
+            for (int j = 0; j < 10; j++) {
+                sb.append(characters.charAt(random.nextInt(characters.length())));
+            }
+            String code = sb.toString();
+            if (!bookingRepository.existsByCheckinCode(code)) {
+                return code;
+            }
+        }
+        return java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
     }
 
     private String toJson(Object obj) {

@@ -37,6 +37,12 @@ public class Booking {
     @Column(name = "active_slot_start", insertable = false, updatable = false)
     private LocalDateTime activeSlotStart;
 
+    @Column(name = "checkin_code", length = 12, unique = true)
+    private String checkinCode;
+
+    @Column(name = "checked_in_at")
+    private LocalDateTime checkedInAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -109,6 +115,22 @@ public class Booking {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getCheckinCode() {
+        return checkinCode;
+    }
+
+    public void setCheckinCode(String checkinCode) {
+        this.checkinCode = checkinCode;
+    }
+
+    public LocalDateTime getCheckedInAt() {
+        return checkedInAt;
+    }
+
+    public void setCheckedInAt(LocalDateTime checkedInAt) {
+        this.checkedInAt = checkedInAt;
     }
 
     @PrePersist

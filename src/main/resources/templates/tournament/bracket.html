@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: head(${bracket.tournamentName} + ' - Bracket')}"></head>
+<head th:replace="~{fragments/layout :: head(${bracket.tournamentName} + ' - Live Bracket - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
@@ -9,16 +9,16 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <h2 class="fw-bold mb-0" th:text="${bracket.tournamentName}">Valorant Spring Invitational</h2>
+                    <h2 class="fw-bold text-dark mb-0" th:text="${bracket.tournamentName}">Valorant Spring Invitational</h2>
                     <span id="tourney-status-badge"
                           th:class="${bracket.status == 'COMPLETED'} ? 'badge bg-success' : (${bracket.status == 'IN_PROGRESS'} ? 'badge bg-warning text-dark' : 'badge bg-secondary')"
                           th:text="${bracket.status}">
                         IN_PROGRESS
                     </span>
                 </div>
-                <p class="text-muted mb-0">
+                <p class="text-secondary mb-0">
                     <span class="badge bg-dark me-1" th:text="${bracket.gameTitle}">Game</span>
-                    <span class="text-muted small">&bull; Single Elimination Bracket</span>
+                    <span class="text-muted small">&bull; Single Elimination Tournament</span>
                     <span class="ms-3 text-muted small"><i class="bi bi-broadcast text-danger me-1"></i>Live updates every 10s</span>
                 </p>
             </div>
@@ -29,12 +29,16 @@
             </div>
         </div>
 
-        <div th:if="${#lists.isEmpty(bracket.rounds)}" class="card p-5 text-center shadow-sm">
+        <!-- Friendly Empty State if bracket not generated -->
+        <div th:if="${#lists.isEmpty(bracket.rounds)}" class="card p-5 text-center shadow-sm border-0 my-4">
             <div class="mb-3 text-muted">
-                <i class="bi bi-diagram-3 display-4"></i>
+                <i class="bi bi-diagram-3 display-3"></i>
             </div>
             <h4 class="fw-bold text-dark">Bracket Not Generated Yet</h4>
-            <p class="text-muted mb-0">The bracket tree will be displayed once the tournament registration closes and the bracket is generated.</p>
+            <p class="text-muted mb-4">The bracket tree will be displayed here once tournament registration closes and the bracket is generated.</p>
+            <div>
+                <a th:href="@{/tournaments}" class="btn btn-navy btn-sm">Back to Tournaments</a>
+            </div>
         </div>
 
         <!-- Single-Elimination Tree (Rounds as Columns) -->
@@ -42,14 +46,14 @@
              id="tournament-bracket"
              th:attr="data-tournament-id=${bracket.tournamentId}"
              class="d-flex flex-row overflow-auto pb-4 gap-4 align-items-stretch"
-             style="min-height: 500px;">
+             style="min-height: 520px;">
 
             <div th:each="round : ${bracket.rounds}"
                  class="d-flex flex-column"
-                 style="min-width: 260px; max-width: 300px; flex: 1;">
+                 style="min-width: 270px; max-width: 320px; flex: 1;">
 
                 <!-- Round Header -->
-                <div class="card bg-dark text-white text-center py-2 mb-3 shadow-sm border-0">
+                <div class="card bg-dark text-white text-center py-2 mb-3 shadow-sm border-0 rounded-pill">
                     <span class="fw-bold text-uppercase tracking-wide small" th:text="${round.roundName}">Round 1</span>
                 </div>
 
@@ -58,7 +62,7 @@
                     <div th:each="m : ${round.matches}"
                          class="card shadow-sm border ah-match-box"
                          th:attr="data-match-id=${m.matchId}"
-                         style="border-radius: 10px; overflow: hidden; background: #ffffff;">
+                         style="border-radius: 14px; overflow: hidden; background: #ffffff;">
 
                         <div class="card-header py-1 px-3 bg-light d-flex justify-content-between align-items-center border-bottom" style="font-size: 0.75rem;">
                             <span class="text-muted fw-semibold" th:text="'Match #' + ${m.bracketPosition}">Match #1</span>

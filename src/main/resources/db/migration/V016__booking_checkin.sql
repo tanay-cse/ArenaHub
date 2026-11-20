@@ -1,0 +1,1 @@
+ALTER TABLE bookings ADD COLUMN checkin_code VARCHAR(12) NULL UNIQUE, ADD COLUMN checked_in_at DATETIME NULL;

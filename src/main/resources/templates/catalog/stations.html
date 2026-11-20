@@ -1,44 +1,67 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Gaming Stations')}"></head>
+<head th:replace="~{fragments/layout :: head('Gaming Stations - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
 
     <main class="container my-5 flex-grow-1">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h2 mb-0">Gaming Stations & Catalog</h1>
-            <span class="badge bg-secondary px-3 py-2 fs-6" th:text="${stations.size()} + ' Stations Available'">0 Stations</span>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="h2 mb-1">Gaming Stations &amp; Catalog</h1>
+                <p class="text-secondary mb-0">High-performance gaming rigs, current-gen consoles, and racing simulators.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-dark px-3 py-2 fs-6" th:text="${stations.size()} + ' Stations Active'">0 Stations</span>
+            </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-3" th:each="station : ${stations}">
-                <div class="card h-100 shadow-sm border-secondary">
-                    <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-info" th:text="${station.stationNumber}">ST-01</span>
+        <!-- Friendly Empty State -->
+        <div th:if="${#lists.isEmpty(stations)}" class="card p-5 text-center shadow-sm border-0">
+            <div class="mb-3 text-muted">
+                <i class="bi bi-display display-3"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Gaming Stations Available</h4>
+            <p class="text-muted mb-4">Our stations are currently undergoing maintenance or catalog configuration. Check back soon!</p>
+            <div>
+                <a th:href="@{/bookings}" class="btn btn-navy btn-sm">Check Bookings</a>
+            </div>
+        </div>
+
+        <!-- Stations Grid -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4" th:unless="${#lists.isEmpty(stations)}">
+            <div class="col" th:each="station : ${stations}">
+                <div class="card h-100 shadow-sm border d-flex flex-column" style="border-radius: var(--radius-card);">
+                    <!-- Card Header -->
+                    <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center py-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold fs-5 text-dark" th:text="${station.stationNumber}">ST-01</span>
+                            <span class="badge bg-light text-secondary border small" th:text="${station.stationType}">PC_VIP</span>
+                        </div>
                         <span th:class="'badge ' + (${station.status == 'AVAILABLE'} ? 'bg-success' : (${station.status == 'OCCUPIED'} ? 'bg-danger' : 'bg-warning text-dark'))"
                               th:text="${station.status}">AVAILABLE</span>
                     </div>
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <small class="text-secondary">Type:</small>
-                            <span class="fw-semibold text-light ms-1" th:text="${station.stationType}">PC_VIP</span>
-                        </div>
-                        <div class="mb-3">
-                            <small class="text-secondary">Hourly Rate:</small>
-                            <span class="fw-bold text-warning ms-1" th:text="'₹' + ${station.hourlyRate} + ' / hr'">₹150.00 / hr</span>
+
+                    <!-- Card Body -->
+                    <div class="card-body flex-grow-1">
+                        <div class="mb-3 p-2 bg-light rounded-3 text-center">
+                            <small class="text-secondary d-block">Hourly Rate</small>
+                            <span class="fs-4 fw-bold text-dark" th:text="'₹' + ${station.hourlyRate}">₹150.00</span>
+                            <span class="text-muted small"> / hr</span>
                         </div>
 
                         <div>
-                            <small class="text-secondary d-block mb-1">Installed Games:</small>
+                            <small class="text-secondary fw-semibold d-block mb-2">Installed Games</small>
                             <div th:if="${#lists.isEmpty(station.stationGames)}">
-                                <span class="text-muted small fst-italic">No games installed</span>
+                                <span class="text-muted small fst-italic">No games installed yet</span>
                             </div>
                             <div class="d-flex flex-wrap gap-1" th:unless="${#lists.isEmpty(station.stationGames)}">
-                                <span class="badge bg-secondary" th:each="sg : ${station.stationGames}" th:text="${sg.game.title}">Game</span>
+                                <span class="badge bg-light text-dark border" th:each="sg : ${station.stationGames}" th:text="${sg.game.title}">Game</span>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Card Footer -->
                     <div class="card-footer bg-transparent border-0 pt-0 pb-3">
                         <a th:href="@{/stations/{id}/availability(id=${station.id})}" class="btn btn-navy btn-sm w-100">
                             <i class="bi bi-calendar3 me-1"></i>Check Availability

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('My Points & History')}"></head>
+<head th:replace="~{fragments/layout :: head('My Points & History - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
@@ -8,50 +8,56 @@
     <main class="container my-5 flex-grow-1">
         <div class="row g-4 mb-4">
             <div class="col-md-6 col-lg-5">
-                <div class="card p-4 shadow-sm border-secondary h-100 d-flex flex-column justify-content-between">
+                <div class="card p-4 shadow-sm border-0 h-100 d-flex flex-column justify-content-between">
                     <div>
-                        <span class="text-secondary text-uppercase small fw-bold">Loyalty Balance</span>
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Loyalty Balance</span>
                         <div class="my-2">
-                            <span class="display-3 fw-bold text-warning" th:text="${balance}">0</span>
-                            <span class="fs-4 text-light ms-1">pts</span>
+                            <span class="display-4 fw-bold text-dark" th:text="${balance}">0</span>
+                            <span class="fs-4 text-secondary ms-1">pts</span>
                         </div>
                         <p class="text-secondary small mb-3">
-                            Points are earned from station gaming hours, community events, and adjustments.
+                            Points are earned from station gaming hours, campus tournaments, and bonus community events.
                         </p>
                     </div>
                     <div>
-                        <a th:href="@{/rewards}" class="btn btn-accent btn-sm">Browse Rewards Catalog</a>
+                        <a th:href="@{/rewards}" class="btn btn-navy btn-sm">Browse Rewards Catalog</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-7">
-                <div class="card p-4 shadow-sm border-secondary h-100">
-                    <h5 class="card-title text-info mb-3">About Points</h5>
+                <div class="card p-4 shadow-sm border-0 h-100">
+                    <h5 class="fw-bold text-dark mb-3">About Loyalty Points</h5>
                     <ul class="text-secondary small mb-0 ps-3">
-                        <li class="mb-2"><strong>Earn on Bookings:</strong> Every confirmed gaming session earns reward points.</li>
-                        <li class="mb-2"><strong>Redemptions:</strong> Spend your points on gaming hours, drinks, and merchandise.</li>
-                        <li><strong>Transparent Ledger:</strong> Every points change is recorded in your ledger below.</li>
+                        <li class="mb-2"><strong>Earn on Bookings:</strong> Every confirmed gaming session earns reward points automatically.</li>
+                        <li class="mb-2"><strong>Redemptions:</strong> Spend your points on gaming hours, drinks, snacks, and arena merchandise.</li>
+                        <li><strong>Transparent Ledger:</strong> Every adjustment and redemption is logged below in your immutable ledger.</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div class="card p-4 shadow-sm border-secondary">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <h5 class="card-title mb-0">Points Ledger History</h5>
-                <span class="badge bg-secondary" th:text="${history.size()} + ' transactions'">0 transactions</span>
+        <div class="card p-4 shadow-sm border-0">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 pb-2 border-bottom">
+                <h5 class="fw-bold text-dark mb-0">Points Ledger History</h5>
+                <span class="badge bg-dark" th:text="${history.size()} + ' transactions'">0 transactions</span>
             </div>
 
-            <div th:if="${#lists.isEmpty(history)}" class="alert alert-secondary text-center my-3">
-                <p class="mb-0">No points transactions recorded yet.</p>
+            <!-- Friendly Empty State -->
+            <div th:if="${#lists.isEmpty(history)}" class="text-center py-5">
+                <div class="mb-3 text-muted">
+                    <i class="bi bi-journal-x display-4"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No Points Transactions Yet</h5>
+                <p class="text-muted mb-4">Your point earning and redemption activity will appear here.</p>
+                <a th:href="@{/bookings}" class="btn btn-navy btn-sm">Reserve a Station to Earn Points</a>
             </div>
 
             <div class="table-responsive" th:unless="${#lists.isEmpty(history)}">
-                <table class="table table-dark table-hover align-middle mb-0">
+                <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Date & Time</th>
+                            <th>Date &amp; Time</th>
                             <th>Transaction Type</th>
                             <th>Description</th>
                             <th class="text-end">Points Change</th>
@@ -66,9 +72,7 @@
                                 <span th:if="${entry.transactionType == 'ADJUSTMENT'}" class="badge bg-info text-dark">ADJUSTMENT</span>
                             </td>
                             <td>
-                                <span th:text="${entry.description} ?: '-'">Transaction description</span>
-                                <span th:if="${entry.booking != null}" class="badge bg-secondary ms-1" th:text="'Booking #' + ${entry.booking.id}">Booking #1</span>
-                                <span th:if="${entry.reward != null}" class="badge bg-secondary ms-1" th:text="'Reward: ' + ${entry.reward.name}">Reward</span>
+                                <span class="fw-semibold text-dark" th:text="${entry.description} ?: '-'">Transaction description</span>
                             </td>
                             <td class="text-end fw-bold">
                                 <span th:if="${entry.pointsChange > 0}" class="text-success" th:text="'+' + ${entry.pointsChange}">+100</span>

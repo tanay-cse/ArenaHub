@@ -1,74 +1,152 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+<head th:replace="~{fragments/layout :: head('Admin Dashboard - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
 
     <main class="container my-5 flex-grow-1">
+        <!-- Header & Quick Nav -->
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div>
                 <h1 class="h2 mb-1">Admin Dashboard</h1>
-                <p class="text-secondary mb-0">Overview of Arena Hub key platform metrics and operations.</p>
+                <p class="text-secondary mb-0">Platform operational metrics, booking throughput, and system controls.</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <a th:href="@{/admin/users}" class="btn btn-outline-info btn-sm">Users</a>
-                <a th:href="@{/admin/stations}" class="btn btn-outline-info btn-sm">Stations</a>
-                <a th:href="@{/admin/games}" class="btn btn-outline-info btn-sm">Games</a>
-                <a th:href="@{/admin/rewards}" class="btn btn-outline-info btn-sm">Rewards</a>
-                <a th:href="@{/admin/pricing-rules}" class="btn btn-outline-info btn-sm">Pricing Rules</a>
-                <a th:href="@{/admin/tournaments/new}" class="btn btn-outline-info btn-sm">New Tournament</a>
-                <a th:href="@{/admin/matches/disputes}" class="btn btn-outline-info btn-sm">Disputes</a>
-                <a th:href="@{/admin/audit}" class="btn btn-outline-info btn-sm">Audit Logs</a>
+                <a th:href="@{/admin/reports}" class="btn btn-navy btn-sm">
+                    <i class="bi bi-graph-up me-1"></i>Reports &amp; Analytics
+                </a>
+                <a th:href="@{/admin/audit}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-shield-check me-1"></i>Audit Logs
+                </a>
             </div>
         </div>
 
+        <!-- Management Shortcuts Pill Bar -->
+        <div class="card p-3 shadow-sm mb-4 border-0">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <span class="fw-semibold text-secondary small text-uppercase tracking-wide me-1"><i class="bi bi-sliders me-1"></i>Management:</span>
+                <a th:href="@{/admin/users}" class="btn btn-outline-dark btn-sm">Users</a>
+                <a th:href="@{/admin/stations}" class="btn btn-outline-dark btn-sm">Stations</a>
+                <a th:href="@{/admin/games}" class="btn btn-outline-dark btn-sm">Games</a>
+                <a th:href="@{/admin/rewards}" class="btn btn-outline-dark btn-sm">Rewards</a>
+                <a th:href="@{/admin/pricing-rules}" class="btn btn-outline-dark btn-sm">Pricing Rules</a>
+                <a th:href="@{/admin/tournaments/new}" class="btn btn-outline-dark btn-sm">New Tournament</a>
+                <a th:href="@{/admin/matches/disputes}" class="btn btn-outline-dark btn-sm">Disputes</a>
+            </div>
+        </div>
+
+        <!-- Stat Cards Grid -->
         <div class="row g-4 mb-4">
+            <!-- Total Users -->
             <div class="col-sm-6 col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary h-100">
-                    <span class="text-secondary text-uppercase small fw-bold">Total Users</span>
-                    <div class="display-4 fw-bold text-info my-2" th:text="${totalUsers}">0</div>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Total Users</span>
+                        <div class="stat-icon-wrapper" style="background-color: rgba(24, 103, 210, 0.1); color: var(--accent);">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold text-dark my-1" th:text="${totalUsers}">0</div>
                     <small class="text-secondary">Registered accounts across all roles</small>
                 </div>
             </div>
 
+            <!-- Total Stations -->
             <div class="col-sm-6 col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary h-100">
-                    <span class="text-secondary text-uppercase small fw-bold">Total Stations</span>
-                    <div class="display-4 fw-bold text-success my-2" th:text="${totalStations}">0</div>
-                    <small class="text-secondary">Gaming PCs, consoles, and simulators</small>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Total Stations</span>
+                        <div class="stat-icon-wrapper" style="background-color: rgba(30, 142, 90, 0.1); color: var(--success);">
+                            <i class="bi bi-display"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold text-dark my-1" th:text="${totalStations}">0</div>
+                    <small class="text-secondary">Gaming rigs, consoles, and simulators</small>
                 </div>
             </div>
 
+            <!-- Total Bookings -->
             <div class="col-sm-6 col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary h-100">
-                    <span class="text-secondary text-uppercase small fw-bold">Total Bookings</span>
-                    <div class="display-4 fw-bold text-warning my-2" th:text="${totalBookings}">0</div>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Total Bookings</span>
+                        <div class="stat-icon-wrapper" style="background-color: rgba(196, 138, 0, 0.1); color: var(--warning);">
+                            <i class="bi bi-calendar-check-fill"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold text-dark my-1" th:text="${totalBookings}">0</div>
                     <small class="text-secondary">All reservations across all statuses</small>
                 </div>
             </div>
 
+            <!-- Upcoming Tournaments -->
             <div class="col-sm-6 col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary h-100">
-                    <span class="text-secondary text-uppercase small fw-bold">Upcoming Tournaments</span>
-                    <div class="display-4 fw-bold text-primary my-2" th:text="${upcomingTournaments}">0</div>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Tournaments</span>
+                        <div class="stat-icon-wrapper" style="background-color: rgba(14, 27, 44, 0.08); color: var(--bg-dark);">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold text-dark my-1" th:text="${upcomingTournaments}">0</div>
                     <small class="text-secondary">Future scheduled active tournaments</small>
                 </div>
             </div>
 
+            <!-- Open Waitlist Entries -->
             <div class="col-sm-6 col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary h-100">
-                    <span class="text-secondary text-uppercase small fw-bold">Open Waitlist Entries</span>
-                    <div class="display-4 fw-bold text-cyan my-2" th:text="${openWaitlistEntries}">0</div>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Waitlist Entries</span>
+                        <div class="stat-icon-wrapper" style="background-color: rgba(79, 142, 247, 0.12); color: var(--accent-light);">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold text-dark my-1" th:text="${openWaitlistEntries}">0</div>
                     <small class="text-secondary">Users waiting for released slots</small>
                 </div>
             </div>
 
+            <!-- Pending Disputes -->
             <div class="col-sm-6 col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary h-100">
-                    <span class="text-secondary text-uppercase small fw-bold">Pending Disputes</span>
-                    <div class="display-4 fw-bold text-danger my-2" th:text="${pendingDisputes}">0</div>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary text-uppercase small fw-bold tracking-wide">Pending Disputes</span>
+                        <div class="stat-icon-wrapper" style="background-color: rgba(209, 64, 58, 0.1); color: var(--danger);">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                    </div>
+                    <div class="display-5 fw-bold text-dark my-1" th:text="${pendingDisputes}">0</div>
                     <small class="text-secondary">Contested match results needing resolution</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Activity Summary Card -->
+        <div class="card p-4 shadow-sm border-0">
+            <h5 class="fw-bold text-dark mb-3">Platform Operations Overview</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                        <div class="fw-semibold text-dark mb-1"><i class="bi bi-graph-up me-1 text-primary"></i>Analytics &amp; Views</div>
+                        <div class="small text-secondary mb-2">View real-time daily revenue and hourly station utilization.</div>
+                        <a th:href="@{/admin/reports}" class="btn btn-outline-dark btn-sm">Open Reports</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                        <div class="fw-semibold text-dark mb-1"><i class="bi bi-people me-1 text-primary"></i>User Governance</div>
+                        <div class="small text-secondary mb-2">Toggle account ban status and manage loyalty balances.</div>
+                        <a th:href="@{/admin/users}" class="btn btn-outline-dark btn-sm">Manage Users</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                        <div class="fw-semibold text-dark mb-1"><i class="bi bi-tag me-1 text-primary"></i>Dynamic Pricing</div>
+                        <div class="small text-secondary mb-2">Configure peak hour multipliers and member discounts.</div>
+                        <a th:href="@{/admin/pricing-rules}" class="btn btn-outline-dark btn-sm">Pricing Rules</a>
+                    </div>
                 </div>
             </div>
         </div>

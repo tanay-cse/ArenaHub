@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Audit Logs')}"></head>
+<head th:replace="~{fragments/layout :: head('Audit Logs - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
@@ -12,24 +12,30 @@
                 <p class="text-secondary mb-0">System and administrative activity audit trail (latest 100 entries).</p>
             </div>
             <div class="d-flex gap-2">
-                <a th:href="@{/admin/rewards}" class="btn btn-outline-info">Manage Rewards</a>
-                <a th:href="@{/admin/stations}" class="btn btn-outline-info">Manage Stations</a>
-                <a th:href="@{/admin/games}" class="btn btn-outline-info">Manage Games</a>
+                <a th:href="@{/admin}" class="btn btn-outline-dark btn-sm">Dashboard</a>
+                <a th:href="@{/admin/rewards}" class="btn btn-outline-dark btn-sm">Rewards</a>
+                <a th:href="@{/admin/stations}" class="btn btn-outline-dark btn-sm">Stations</a>
+                <a th:href="@{/admin/games}" class="btn btn-outline-dark btn-sm">Games</a>
             </div>
         </div>
 
-        <div class="card p-3 shadow-sm border-secondary">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title mb-0">Audit Trail</h5>
-                <span class="badge bg-secondary" th:text="${logs.size()} + ' records'">0 records</span>
+        <div class="card p-4 shadow-sm border-0">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h5 class="fw-bold text-dark mb-0">System Audit Trail</h5>
+                <span class="badge bg-dark" th:text="${logs.size()} + ' records'">0 records</span>
             </div>
 
-            <div th:if="${#lists.isEmpty(logs)}" class="alert alert-secondary text-center my-3">
-                <p class="mb-0">No audit log records found.</p>
+            <!-- Friendly Empty State -->
+            <div th:if="${#lists.isEmpty(logs)}" class="text-center py-5">
+                <div class="mb-3 text-muted">
+                    <i class="bi bi-shield-check display-4"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No Audit Logs Found</h5>
+                <p class="text-muted mb-0">No mutating system or administrative activities have been logged yet.</p>
             </div>
 
             <div class="table-responsive" th:unless="${#lists.isEmpty(logs)}">
-                <table class="table table-dark table-hover align-middle mb-0">
+                <table class="table align-middle mb-0">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -46,20 +52,20 @@
                         <tr th:each="entry : ${logs}">
                             <td class="text-secondary small" th:text="${entry.id}">1</td>
                             <td class="text-secondary small" th:text="${#temporals.format(entry.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2026-11-19 12:00:00</td>
-                            <td class="fw-semibold text-light" th:text="${entry.user != null ? entry.user.email : 'SYSTEM'}">admin@arenahub.com</td>
+                            <td class="fw-semibold text-dark" th:text="${entry.user != null ? entry.user.email : 'SYSTEM'}">admin@arenahub.com</td>
                             <td>
                                 <span class="badge bg-primary" th:text="${entry.action}">ACTION</span>
                             </td>
                             <td>
-                                <span class="fw-bold text-info" th:text="${entry.entityName}">Entity</span>
-                                <span th:if="${entry.entityId != null}" class="badge bg-secondary ms-1" th:text="'#' + ${entry.entityId}">#1</span>
+                                <span class="fw-bold text-dark" th:text="${entry.entityName}">Entity</span>
+                                <span th:if="${entry.entityId != null}" class="badge bg-light text-secondary border ms-1" th:text="'#' + ${entry.entityId}">#1</span>
                             </td>
                             <td class="small text-secondary" th:text="${entry.ipAddress} ?: '-'">127.0.0.1</td>
                             <td>
-                                <code class="small text-secondary" th:text="${entry.oldValue} ?: '-'">-</code>
+                                <code class="small text-muted" th:text="${entry.oldValue} ?: '-'">-</code>
                             </td>
                             <td>
-                                <code class="small text-info" th:text="${entry.newValue} ?: '-'">-</code>
+                                <code class="small text-primary fw-bold" th:text="${entry.newValue} ?: '-'">-</code>
                             </td>
                         </tr>
                     </tbody>

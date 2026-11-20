@@ -107,10 +107,14 @@ public class MatchController {
 
         List<EloService.MatchHistoryItem> matchHistory = eloService.getUserMatchHistory(currentUser.getId());
         EloService.StreakInfo streak = eloService.computeStreak(currentUser.getId());
+        List<EloService.GameRatingHistory> ratingHistories = eloService.getRatingHistoryByGame(currentUser.getId());
+        List<EloService.BadgeDTO> userBadges = eloService.getUserBadges(currentUser.getId());
 
         model.addAttribute("matches", matchHistory);
         model.addAttribute("streak", streak);
         model.addAttribute("user", currentUser);
+        model.addAttribute("ratingHistories", ratingHistories);
+        model.addAttribute("userBadges", userBadges);
 
         return "elo/matches-mine";
     }

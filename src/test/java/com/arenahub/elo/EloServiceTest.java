@@ -39,6 +39,15 @@ class EloServiceTest {
     @Mock
     private GameRepository gameRepository;
 
+    @Mock
+    private BadgeRepository badgeRepository;
+
+    @Mock
+    private UserBadgeRepository userBadgeRepository;
+
+    @Mock
+    private com.arenahub.audit.AuditService auditService;
+
     @InjectMocks
     private EloService eloService;
 

@@ -12,6 +12,8 @@ public interface PointsLedgerRepository extends JpaRepository<PointsLedger, Long
 
     List<PointsLedger> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    boolean existsByBookingId(Long bookingId);
+
     @Query("SELECT COALESCE(SUM(p.pointsChange), 0L) FROM PointsLedger p WHERE p.user.id = :userId")
     Long calculateBalanceByUserId(@Param("userId") Long userId);
 }

@@ -474,3 +474,269 @@ footer.ah-footer a:hover {
 footer.ah-footer .footer-divider {
     border-color: rgba(255, 255, 255, 0.12);
 }
+
+/* Date Strip & Slot Chips (Pass A Redesign) */
+.date-strip {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.date-pill {
+    min-width: 84px;
+    padding: 0.6rem 0.95rem;
+    text-align: center;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    user-select: none;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.date-pill:hover {
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+.date-pill.active {
+    background-color: var(--bg-dark) !important;
+    border-color: var(--bg-dark) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(14, 27, 44, 0.25);
+}
+
+.date-pill.active span, .date-pill.active small {
+    color: #FFFFFF !important;
+}
+
+/* Slot Chips */
+.slot-chip {
+    padding: 0.85rem 0.75rem;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    text-decoration: none;
+}
+
+.slot-chip.slot-available {
+    border-color: rgba(30, 142, 90, 0.4);
+    background-color: #FFFFFF;
+}
+
+.slot-chip.slot-available:hover {
+    border-color: var(--success);
+    box-shadow: 0 4px 12px rgba(30, 142, 90, 0.15);
+    transform: translateY(-2px);
+}
+
+.slot-chip.slot-selected {
+    background-color: var(--bg-dark) !important;
+    border-color: var(--bg-dark) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 6px 16px rgba(14, 27, 44, 0.25);
+    transform: translateY(-2px);
+}
+
+.slot-chip.slot-selected span, .slot-chip.slot-selected small {
+    color: #FFFFFF !important;
+}
+
+.slot-chip.slot-selected .badge {
+    background-color: #FFFFFF !important;
+    color: var(--bg-dark) !important;
+}
+
+.slot-chip.slot-booked {
+    background-color: var(--surface);
+    border-color: rgba(209, 64, 58, 0.3);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.slot-chip.slot-maintenance {
+    background-color: var(--surface);
+    border-color: rgba(196, 138, 0, 0.3);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.slot-chip.slot-past {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Station Choice Card in Booking page */
+.station-choice-card {
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--bg);
+}
+
+.station-choice-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(24, 103, 210, 0.12);
+}
+
+.station-choice-card.selected {
+    border-color: var(--bg-dark);
+    background-color: rgba(14, 27, 44, 0.04);
+    box-shadow: 0 4px 14px rgba(14, 27, 44, 0.15);
+}
+
+/* Tournaments Event Cards */
+.tournament-card {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-card) !important;
+    box-shadow: var(--shadow-card) !important;
+    background-color: var(--bg) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tournament-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(14, 27, 44, 0.12) !important;
+}
+
+.tournament-date-box {
+    min-width: 62px;
+    padding: 0.5rem;
+    border-radius: 12px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+/* Rewards Plan-Style Cards */
+.reward-plan-card {
+    position: relative;
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-card) !important;
+    background-color: var(--bg) !important;
+    box-shadow: var(--shadow-card) !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.reward-plan-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(14, 27, 44, 0.14) !important;
+}
+
+.reward-plan-card.featured {
+    border-color: var(--accent) !important;
+    box-shadow: 0 12px 30px rgba(24, 103, 210, 0.18) !important;
+}
+
+.popular-ribbon {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent);
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.95rem;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 4px 10px rgba(24, 103, 210, 0.35);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
+/* Podium for Top 3 */
+.podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+    padding-top: 1.5rem;
+}
+
+.podium-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 170px;
+}
+
+.podium-step {
+    width: 100%;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 -4px 16px rgba(14, 27, 44, 0.06);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    font-weight: 700;
+}
+
+.podium-1 {
+    height: 140px;
+    background: linear-gradient(180deg, #FFF9E6 0%, #F6F7F9 100%);
+    border-color: #E6C84F;
+}
+
+.podium-2 {
+    height: 105px;
+    background: linear-gradient(180deg, #F3F4F7 0%, #FFFFFF 100%);
+}
+
+.podium-3 {
+    height: 80px;
+    background: linear-gradient(180deg, #FDF4EB 0%, #FFFFFF 100%);
+    border-color: #E8B48B;
+}
+
+/* Stat Cards */
+.stat-card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    box-shadow: var(--shadow-card);
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(14, 27, 44, 0.12);
+}
+
+.stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}

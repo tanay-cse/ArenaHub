@@ -1,48 +1,51 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Manage Rewards')}"></head>
+<head th:replace="~{fragments/layout :: head('Manage Rewards - Arena Hub')}"></head>
 <body>
     <header th:replace="~{fragments/layout :: navbar}"></header>
     <div th:replace="~{fragments/layout :: flash-messages}"></div>
 
     <main class="container my-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-            <h1 class="h2 mb-0">Rewards Management</h1>
+            <div>
+                <h1 class="h2 mb-1">Rewards Management</h1>
+                <p class="text-secondary mb-0">Create, edit, and control inventory for campus loyalty rewards.</p>
+            </div>
             <div class="d-flex gap-2">
-                <a th:href="@{/admin/stations}" class="btn btn-outline-info">Manage Stations</a>
-                <a th:href="@{/admin/games}" class="btn btn-outline-info">Manage Games</a>
-                <a th:href="@{/rewards}" class="btn btn-outline-light">Student Rewards View</a>
+                <a th:href="@{/admin/stations}" class="btn btn-outline-dark btn-sm">Manage Stations</a>
+                <a th:href="@{/admin/games}" class="btn btn-outline-dark btn-sm">Manage Games</a>
+                <a th:href="@{/rewards}" class="btn btn-outline-dark btn-sm">Student Rewards View</a>
             </div>
         </div>
 
         <div class="row g-4 mb-5">
             <div class="col-lg-4">
-                <div class="card p-3 shadow-sm border-secondary">
-                    <h5 class="card-title mb-3" th:text="${reward.id == null} ? 'Add New Reward' : 'Edit Reward: ' + ${reward.name}">Add Reward</h5>
+                <div class="card p-4 shadow-sm border-0">
+                    <h5 class="fw-bold text-dark mb-3" th:text="${reward.id == null} ? 'Add New Reward' : 'Edit Reward: ' + ${reward.name}">Add Reward</h5>
                     <form th:action="@{/admin/rewards}" th:object="${reward}" method="post">
                         <input type="hidden" th:field="*{id}">
                         <div class="mb-3">
                             <label class="form-label">Reward Name</label>
-                            <input type="text" th:field="*{name}" class="form-control bg-dark text-light border-secondary" required maxlength="100" placeholder="e.g. Free 1 Hour Pass">
+                            <input type="text" th:field="*{name}" class="form-control" required maxlength="100" placeholder="e.g. Free 1 Hour Pass">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea th:field="*{description}" class="form-control bg-dark text-light border-secondary" rows="3" placeholder="Details about this reward..."></textarea>
+                            <textarea th:field="*{description}" class="form-control" rows="3" placeholder="Details about this reward..."></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Points Cost</label>
-                            <input type="number" min="1" th:field="*{pointsCost}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. 100">
+                            <input type="number" min="1" th:field="*{pointsCost}" class="form-control" required placeholder="e.g. 100">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Stock Quantity</label>
-                            <input type="number" min="0" th:field="*{stockQuantity}" class="form-control bg-dark text-light border-secondary" required placeholder="e.g. 50">
+                            <input type="number" min="0" th:field="*{stockQuantity}" class="form-control" required placeholder="e.g. 50">
                         </div>
                         <div class="form-check mb-3">
                             <input type="checkbox" th:field="*{isActive}" class="form-check-input" id="isActiveCheck">
-                            <label class="form-check-label" for="isActiveCheck">Active (Visible to Students)</label>
+                            <label class="form-check-label text-dark" for="isActiveCheck">Active (Visible to Students)</label>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-accent flex-grow-1" th:text="${reward.id == null} ? 'Create Reward' : 'Update Reward'">Save</button>
+                            <button type="submit" class="btn btn-navy flex-grow-1" th:text="${reward.id == null} ? 'Create Reward' : 'Update Reward'">Save</button>
                             <a th:if="${reward.id != null}" th:href="@{/admin/rewards}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
@@ -50,10 +53,14 @@
             </div>
 
             <div class="col-lg-8">
-                <div class="card p-3 shadow-sm border-secondary">
-                    <h5 class="card-title mb-3">Rewards Roster</h5>
+                <div class="card p-4 shadow-sm border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h5 class="fw-bold text-dark mb-0">Rewards Roster</h5>
+                        <span class="badge bg-dark" th:text="${rewards.size()} + ' rewards'">0 rewards</span>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover align-middle mb-0">
+                        <table class="table align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -65,24 +72,28 @@
                             </thead>
                             <tbody>
                                 <tr th:if="${#lists.isEmpty(rewards)}">
-                                    <td colspan="5" class="text-center text-secondary py-3">No rewards found.</td>
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="bi bi-gift display-4 text-muted mb-2 d-block"></i>
+                                        <span class="fw-semibold">No rewards configured</span>
+                                        <div class="small">Add your first catalog reward using the form on the left.</div>
+                                    </td>
                                 </tr>
                                 <tr th:each="r : ${rewards}">
                                     <td>
-                                        <div class="fw-bold text-info" th:text="${r.name}">Reward Name</div>
+                                        <div class="fw-bold text-dark" th:text="${r.name}">Reward Name</div>
                                         <small class="text-secondary" th:text="${r.description}">Description</small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-warning text-dark fw-semibold" th:text="${r.pointsCost} + ' pts'">100 pts</span>
+                                        <span class="badge bg-warning text-dark fw-bold" th:text="${r.pointsCost} + ' pts'">100 pts</span>
                                     </td>
-                                    <td th:text="${r.stockQuantity}">50</td>
+                                    <td class="fw-semibold text-dark" th:text="${r.stockQuantity}">50</td>
                                     <td>
                                         <span th:class="'badge ' + (${r.isActive} ? 'bg-success' : 'bg-secondary')"
                                               th:text="${r.isActive} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
                                     </td>
                                     <td class="text-end">
                                         <div class="btn-group btn-group-sm">
-                                            <a th:href="@{/admin/rewards/edit/{id}(id=${r.id})}" class="btn btn-outline-light">Edit</a>
+                                            <a th:href="@{/admin/rewards/edit/{id}(id=${r.id})}" class="btn btn-outline-dark">Edit</a>
                                             <form th:if="${r.isActive}" th:action="@{/admin/rewards/deactivate/{id}(id=${r.id})}" method="post" class="d-inline">
                                                 <button type="submit" class="btn btn-outline-danger">Deactivate</button>
                                             </form>

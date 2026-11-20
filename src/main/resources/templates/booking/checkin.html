@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Station Check-in - Arena Hub')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="text-center mb-4">
+                    <h1 class="h2 mb-1"><i class="bi bi-qr-code-scan me-2 text-primary"></i>Station Check-in</h1>
+                    <p class="text-secondary mb-0">Scan your booking QR code or enter your 10-character check-in code to confirm arena arrival.</p>
+                </div>
+
+                <!-- QR Scanner Card -->
+                <div class="card p-4 shadow-sm border-0 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-camera me-2 text-primary"></i>Camera QR Scanner</h5>
+                        <span class="badge bg-light text-secondary border small">html5-qrcode</span>
+                    </div>
+
+                    <div id="qr-reader" class="rounded-3 overflow-hidden bg-light border p-2 mb-3" style="width: 100%; max-width: 480px; margin: 0 auto;"></div>
+
+                    <div class="text-muted small text-center">
+                        <i class="bi bi-info-circle me-1"></i>Position the booking pass QR code directly in the frame to auto-submit check-in.
+                    </div>
+
+                    <!-- Hidden Auto-submit Form triggered on scan -->
+                    <form id="qr-checkin-form" method="post" class="d-none">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    </form>
+                </div>
+
+                <!-- Manual Code Entry Card -->
+                <div class="card p-4 shadow-sm border-0">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-keyboard me-2 text-secondary"></i>Manual Code Entry</h5>
+                    <form th:action="@{/checkin}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold text-uppercase">Check-in Code</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="bi bi-ticket-perforated"></i></span>
+                                <input type="text" name="code" class="form-control text-uppercase font-monospace fw-bold"
+                                       placeholder="e.g. 7K8B2M4X9P" maxlength="12" required autofocus>
+                                <button type="submit" class="btn btn-navy px-4">
+                                    <i class="bi bi-check2-circle me-1"></i>Check In
+                                </button>
+                            </div>
+                            <div class="form-text">Codes are generated when a booking is created and found on your booking pass.</div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a th:href="@{/bookings/mine}" class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-clock-history me-1"></i>View My Bookings &amp; QR Codes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <!-- html5-qrcode CDN -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const qrReaderEl = document.getElementById('qr-reader');
+            if (!qrReaderEl || typeof Html5QrcodeScanner === 'undefined') return;
+
+            let isScanning = true;
+
+            function onScanSuccess(decodedText) {
+                if (!isScanning) return;
+                isScanning = false;
+
+                let code = decodedText.trim();
+                if (code.includes('/')) {
+                    code = code.split('/').pop();
+                }
+
+                const form = document.getElementById('qr-checkin-form');
+                form.action = '/checkin/' + encodeURIComponent(code);
+                form.submit();
+            }
+
+            try {
+                const scanner = new Html5QrcodeScanner(
+                    "qr-reader",
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 },
+                        aspectRatio: 1.0
+                    },
+                    /* verbose= */ false
+                );
+                scanner.render(onScanSuccess);
+            } catch (e) {
+                console.warn('QR scanner failed to initialize camera:', e);
+            }
+        });
+    </script>
+</body>
+</html>

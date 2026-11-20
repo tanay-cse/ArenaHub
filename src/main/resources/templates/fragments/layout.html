@@ -43,6 +43,9 @@
                             <a class="nav-link" th:href="@{/tournaments}">Tournaments</a>
                         </li>
                         <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" th:href="@{/status-board}">Status Board</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
                             <a class="nav-link" th:href="@{/matches/new}">Record match</a>
                         </li>
                         <li class="nav-item" sec:authorize="isAuthenticated()">
@@ -53,6 +56,9 @@
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('STAFF')">
                             <a class="nav-link" th:href="@{/stations}">Station Manager</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="hasAnyRole('STAFF', 'ADMIN')">
+                            <a class="nav-link" th:href="@{/checkin}">Check-in</a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                             <a class="nav-link" th:href="@{/admin}">Dashboard</a>
@@ -74,6 +80,9 @@
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                             <a class="nav-link" th:href="@{/admin/audit}">Audit Logs</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                            <a class="nav-link" th:href="@{/admin/reports}">Reports</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-2">

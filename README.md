@@ -44,3 +44,6 @@ mvn spring-boot:run
 - `V011__waitlist.sql`: Waitlist queue entries for booked station slots (`waitlist`).
 - `V012__pricing_rules.sql`: Dynamic station pricing rules and hourly multipliers (`pricing_rules`).
 - `V013__player_match_stats_view.sql`: Database view aggregating player match statistics and win/loss records (`player_match_stats`).
+- `V014__reporting_views.sql`: Platform analytics and reporting views (`daily_revenue`, `peak_hours`).
+- `V015__badges.sql`: Competitive achievement badges and user badge awards (`badges`, `user_badges`).
+- `V016__booking_checkin.sql`: Reservation check-in codes and arrival timestamps (`bookings`).
