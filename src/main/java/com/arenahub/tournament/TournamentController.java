@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -61,5 +62,23 @@ public class TournamentController {
         }
 
         return "redirect:/tournaments";
+    }
+
+    @GetMapping("/tournaments/{id}/bracket")
+    public String viewBracket(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            TournamentService.TournamentBracketDTO bracket = tournamentService.getTournamentBracket(id);
+            model.addAttribute("bracket", bracket);
+            return "tournament/bracket";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/tournaments";
+        }
+    }
+
+    @GetMapping("/tournaments/{id}/bracket/data")
+    @ResponseBody
+    public TournamentService.TournamentBracketDTO getBracketData(@PathVariable("id") Long id) {
+        return tournamentService.getTournamentBracket(id);
     }
 }

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -62,5 +64,28 @@ public class AdminTournamentController {
             redirectAttributes.addFlashAttribute("tournament", tournament);
             return "redirect:/admin/tournaments/new";
         }
+    }
+
+    @PostMapping("/{id}/generate-bracket")
+    public String generateBracket(@PathVariable("id") Long id,
+                                  @RequestParam(name = "mode", defaultValue = "RANDOM") String mode,
+                                  Principal principal,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            Long adminUserId = null;
+            if (principal != null) {
+                User admin = userRepository.findByEmail(principal.getName()).orElse(null);
+                if (admin != null) {
+                    adminUserId = admin.getId();
+                }
+            }
+
+            tournamentService.generateBracket(id, mode, adminUserId);
+            redirectAttributes.addFlashAttribute("successMessage", "Tournament bracket generated successfully with " + (mode != null ? mode.toUpperCase() : "RANDOM") + " seeding! Tournament is now in progress.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error generating bracket: " + ex.getMessage());
+        }
+
+        return "redirect:/tournaments";
     }
 }

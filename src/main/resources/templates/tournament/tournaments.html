@@ -81,6 +81,27 @@
                                 Registration Closed
                             </button>
                         </div>
+
+                        <!-- Spectate Bracket link -->
+                        <div class="mt-2 text-center">
+                            <a th:href="@{/tournaments/{id}/bracket(id=${t.id})}" class="btn btn-outline-info btn-sm w-100">
+                                <i class="bi bi-diagram-3 me-1"></i>Spectate Bracket
+                            </a>
+                        </div>
+
+                        <!-- Admin Bracket Generation -->
+                        <div sec:authorize="hasRole('ADMIN')" th:if="${t.status == 'REGISTRATION_OPEN' and t.players.size() >= 2}" class="mt-2 pt-2 border-top border-secondary">
+                            <form th:action="@{/admin/tournaments/{id}/generate-bracket(id=${t.id})}" method="post" class="d-flex gap-2">
+                                <select name="mode" class="form-select form-select-sm bg-dark text-light border-secondary" style="max-width: 120px;">
+                                    <option value="RANDOM">Random</option>
+                                    <option value="ELO">ELO</option>
+                                    <option value="MANUAL">Manual</option>
+                                </select>
+                                <button type="submit" class="btn btn-warning btn-sm flex-grow-1 text-dark fw-bold">
+                                    <i class="bi bi-diagram-3 me-1"></i>Generate Bracket
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(${bracket.tournamentName} + ' - Bracket')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container-fluid px-4 my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h2 class="fw-bold mb-0" th:text="${bracket.tournamentName}">Valorant Spring Invitational</h2>
+                    <span id="tourney-status-badge"
+                          th:class="${bracket.status == 'COMPLETED'} ? 'badge bg-success' : (${bracket.status == 'IN_PROGRESS'} ? 'badge bg-warning text-dark' : 'badge bg-secondary')"
+                          th:text="${bracket.status}">
+                        IN_PROGRESS
+                    </span>
+                </div>
+                <p class="text-muted mb-0">
+                    <span class="badge bg-dark me-1" th:text="${bracket.gameTitle}">Game</span>
+                    <span class="text-muted small">&bull; Single Elimination Bracket</span>
+                    <span class="ms-3 text-muted small"><i class="bi bi-broadcast text-danger me-1"></i>Live updates every 10s</span>
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/tournaments}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>All Tournaments
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(bracket.rounds)}" class="card p-5 text-center shadow-sm">
+            <div class="mb-3 text-muted">
+                <i class="bi bi-diagram-3 display-4"></i>
+            </div>
+            <h4 class="fw-bold text-dark">Bracket Not Generated Yet</h4>
+            <p class="text-muted mb-0">The bracket tree will be displayed once the tournament registration closes and the bracket is generated.</p>
+        </div>
+
+        <!-- Single-Elimination Tree (Rounds as Columns) -->
+        <div th:unless="${#lists.isEmpty(bracket.rounds)}"
+             id="tournament-bracket"
+             th:attr="data-tournament-id=${bracket.tournamentId}"
+             class="d-flex flex-row overflow-auto pb-4 gap-4 align-items-stretch"
+             style="min-height: 500px;">
+
+            <div th:each="round : ${bracket.rounds}"
+                 class="d-flex flex-column"
+                 style="min-width: 260px; max-width: 300px; flex: 1;">
+
+                <!-- Round Header -->
+                <div class="card bg-dark text-white text-center py-2 mb-3 shadow-sm border-0">
+                    <span class="fw-bold text-uppercase tracking-wide small" th:text="${round.roundName}">Round 1</span>
+                </div>
+
+                <!-- Matches in this Round -->
+                <div class="d-flex flex-column justify-content-around flex-grow-1 gap-3 py-2">
+                    <div th:each="m : ${round.matches}"
+                         class="card shadow-sm border ah-match-box"
+                         th:attr="data-match-id=${m.matchId}"
+                         style="border-radius: 10px; overflow: hidden; background: #ffffff;">
+
+                        <div class="card-header py-1 px-3 bg-light d-flex justify-content-between align-items-center border-bottom" style="font-size: 0.75rem;">
+                            <span class="text-muted fw-semibold" th:text="'Match #' + ${m.bracketPosition}">Match #1</span>
+                            <span th:class="'badge match-status-badge ' + (${m.status == 'COMPLETED'} ? 'bg-success' : (${m.status == 'DISPUTED'} ? 'bg-warning text-dark' : (${m.status == 'IN_PROGRESS'} ? 'bg-info text-dark' : 'bg-secondary')))"
+                                  th:text="${m.status}" style="font-size: 0.65rem;">
+                                SCHEDULED
+                            </span>
+                        </div>
+
+                        <div class="list-group list-group-flush" style="font-size: 0.85rem;">
+                            <!-- Player 1 Row -->
+                            <div th:class="'list-group-item d-flex justify-content-between align-items-center py-2 px-3 match-p1-row ' + (${m.player1.isWinner} ? 'fw-bold text-success bg-success-subtle' : '')">
+                                <div class="d-flex align-items-center text-truncate me-2">
+                                    <i th:if="${m.player1.isWinner}" class="bi bi-check-circle-fill text-success me-1"></i>
+                                    <span class="text-truncate match-p1-name" th:text="${m.player1.name}">Player 1</span>
+                                </div>
+                                <span class="badge bg-dark match-p1-score"
+                                      th:text="${m.player1.score != null ? m.player1.score : '-'}">
+                                    -
+                                </span>
+                            </div>
+
+                            <!-- Player 2 Row -->
+                            <div th:class="'list-group-item d-flex justify-content-between align-items-center py-2 px-3 match-p2-row ' + (${m.player2.isWinner} ? 'fw-bold text-success bg-success-subtle' : '') + (${m.player2.name == 'BYE' or m.player2.name == 'TBD'} ? ' text-muted' : '')">
+                                <div class="d-flex align-items-center text-truncate me-2">
+                                    <i th:if="${m.player2.isWinner}" class="bi bi-check-circle-fill text-success me-1"></i>
+                                    <span class="text-truncate match-p2-name" th:text="${m.player2.name}">Player 2</span>
+                                </div>
+                                <span class="badge bg-dark match-p2-score"
+                                      th:text="${m.player2.score != null ? m.player2.score : '-'}">
+                                    -
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

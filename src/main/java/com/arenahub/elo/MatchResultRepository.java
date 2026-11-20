@@ -13,5 +13,7 @@ public interface MatchResultRepository extends JpaRepository<MatchResult, Long> 
 
     List<MatchResult> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    List<MatchResult> findByMatchId(Long matchId);
+
     Optional<MatchResult> findFirstByMatchIdAndUserIdNot(Long matchId, Long userId);
 }

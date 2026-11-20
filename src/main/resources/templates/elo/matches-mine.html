@@ -66,7 +66,8 @@
                             <th class="text-center">Outcome</th>
                             <th class="text-center">Score</th>
                             <th class="text-center">Rating Change</th>
-                            <th class="text-end">Date & Time</th>
+                            <th>Date & Time</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,17 +86,24 @@
                                 <span th:if="${m.outcome == 'WIN'}" class="badge bg-success">WIN</span>
                                 <span th:if="${m.outcome == 'LOSS'}" class="badge bg-danger">LOSS</span>
                                 <span th:if="${m.outcome == 'DRAW'}" class="badge bg-secondary">DRAW</span>
+                                <span th:if="${m.outcome == null}" class="badge bg-primary">SCHEDULED</span>
                             </td>
                             <td class="text-center fw-bold">
-                                <span th:text="${m.yourScore}">13</span> – <span th:text="${m.opponentScore}">11</span>
+                                <span th:if="${m.yourScore != null and m.opponentScore != null}" th:text="${m.yourScore} + ' – ' + ${m.opponentScore}">13 – 11</span>
+                                <span th:if="${m.yourScore == null or m.opponentScore == null}" class="text-muted">–</span>
                             </td>
                             <td class="text-center">
                                 <span th:if="${m.ratingChange > 0}" class="text-success fw-bold" th:text="'+' + ${m.ratingChange}">+16</span>
                                 <span th:if="${m.ratingChange < 0}" class="text-danger fw-bold" th:text="${m.ratingChange}">-16</span>
                                 <span th:if="${m.ratingChange == 0}" class="text-muted fw-bold">0</span>
                             </td>
-                            <td class="text-end text-muted small" th:text="${#temporals.format(m.playedAt, 'MMM dd, yyyy HH:mm')}">
+                            <td class="text-muted small" th:text="${#temporals.format(m.playedAt, 'MMM dd, yyyy HH:mm')}">
                                 Nov 20, 2026 14:30
+                            </td>
+                            <td class="text-end">
+                                <a th:if="${m.matchType == 'TOURNAMENT'}" th:href="@{/matches/{id}/report(id=${m.matchId})}" class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size: 0.8rem;">
+                                    <i class="bi bi-file-earmark-text me-1"></i>Report / Dispute
+                                </a>
                             </td>
                         </tr>
                     </tbody>

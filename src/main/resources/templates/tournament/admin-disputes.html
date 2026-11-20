@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Match Disputes')}"></head>
+<body>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div th:replace="~{fragments/layout :: flash-messages}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="bi bi-shield-exclamation text-warning me-2"></i>Match Disputes Review</h2>
+                <p class="text-muted mb-0">Review player-contested match scores, audit dispute reasons, and enter corrected official scores.</p>
+            </div>
+            <div>
+                <a th:href="@{/tournaments}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-trophy me-1"></i>Tournaments
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(disputes)}" class="card p-5 text-center shadow-sm">
+            <div class="mb-3 text-success">
+                <i class="bi bi-check-circle-fill display-4"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Active Match Disputes</h4>
+            <p class="text-muted mb-0">All tournament match results are currently verified and clear.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(disputes)}" class="row g-4">
+            <div class="col-12" th:each="d : ${disputes}">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-header bg-warning bg-opacity-10 border-warning d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <span class="badge bg-warning text-dark fw-bold me-2">DISPUTED</span>
+                            <span class="fw-bold text-dark" th:text="${d.tournamentName}">Tournament Name</span>
+                            <span class="text-muted small ms-2">(&bull; <span th:text="${d.gameTitle}">Game</span>)</span>
+                        </div>
+                        <div class="text-muted small">
+                            Round <span th:text="${d.roundNumber}">1</span>, Match #<span th:text="${d.bracketPosition}">1</span> (ID: #<span th:text="${d.matchId}">10</span>)
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Dispute Reason Callout -->
+                        <div class="alert alert-warning mb-4">
+                            <div class="fw-bold small text-uppercase mb-1"><i class="bi bi-chat-left-quote-fill me-1"></i>Dispute Reason:</div>
+                            <div class="fs-6" th:text="${d.disputeReason}">Player entered incorrect score.</div>
+                        </div>
+
+                        <!-- Re-enter Correct Scores Form -->
+                        <h6 class="fw-bold text-dark mb-3">Re-enter Official Scores:</h6>
+                        <form th:action="@{/matches/{id}/report(id=${d.matchId})}" method="post">
+                            <input type="hidden" name="player1Id" th:value="${d.player1Id}">
+                            <input type="hidden" name="player2Id" th:value="${d.player2Id}">
+
+                            <div class="row g-3 align-items-center mb-3">
+                                <div class="col-md-5">
+                                    <div class="card bg-light p-3 border-0">
+                                        <div class="fw-bold text-dark" th:text="${d.player1Name}">Player 1</div>
+                                        <small class="text-muted d-block mb-2" th:text="${d.player1Email}">p1@example.com</small>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white">Correct Score</span>
+                                            <input type="number" min="0" name="player1Score" class="form-control text-center fw-bold fs-5"
+                                                   th:value="${d.player1Score != null ? d.player1Score : 0}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2 text-center text-muted fw-bold fs-4">
+                                    VS
+                                </div>
+
+                                <div class="col-md-5">
+                                    <div class="card bg-light p-3 border-0">
+                                        <div class="fw-bold text-dark" th:text="${d.player2Name}">Player 2</div>
+                                        <small class="text-muted d-block mb-2" th:text="${d.player2Email}">p2@example.com</small>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white">Correct Score</span>
+                                            <input type="number" min="0" name="player2Score" class="form-control text-center fw-bold fs-5"
+                                                   th:value="${d.player2Score != null ? d.player2Score : 0}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/matches/{id}/report(id=${d.matchId})}" class="btn btn-outline-secondary btn-sm">Inspect Match Page</a>
+                                <button type="submit" class="btn btn-warning fw-bold btn-sm text-dark">
+                                    <i class="bi bi-check2-circle me-1"></i>Resolve Dispute & Update Scores
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
