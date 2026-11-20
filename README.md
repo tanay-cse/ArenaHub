@@ -25,6 +25,11 @@ mvn spring-boot:run
 - Staff: `staff@arenahub.com` / `staff123`
 - Student: `student@arenahub.com` / `student123`
 
+## Seeded Pricing Rules
+- Evening Peak (`PEAK`): 18:00–22:00, 1.50x multiplier across all stations.
+- Morning Off-Peak (`OFF_PEAK`): 10:00–14:00, 0.80x multiplier across all stations.
+- Member Discount (`MEMBER`): 00:00–24:00, 0.90x multiplier across all stations.
+
 ## Database Migrations
 - `V001__core_users_roles.sql`: Core user accounts and roles tables (`roles`, `users`).
 - `V002__seed_demo_users.sql`: Seed data for demo admin, staff, and student accounts.
@@ -35,3 +40,7 @@ mvn spring-boot:run
 - `V007__audit_logs.sql`: Administrative audit logs with JSON change tracking (`audit_logs`).
 - `V008__tournaments.sql`: Esports tournaments and player registrations (`tournaments`, `tournament_players`).
 - `V009__elo_matches.sql`: ELO ratings, match tracking, and match results (`player_ratings`, `matches`, `match_results`).
+- `V010__bookings_checks.sql`: Booking validation constraints on end time and status transitions (`bookings`).
+- `V011__waitlist.sql`: Waitlist queue entries for booked station slots (`waitlist`).
+- `V012__pricing_rules.sql`: Dynamic station pricing rules and hourly multipliers (`pricing_rules`).
+- `V013__player_match_stats_view.sql`: Database view aggregating player match statistics and win/loss records (`player_match_stats`).

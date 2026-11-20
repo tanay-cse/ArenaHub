@@ -131,8 +131,9 @@ public class TournamentService {
         return saved;
     }
 
+    @Transactional
     public TournamentPlayer joinTournament(Long tournamentId, Long userId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
+        Tournament tournament = tournamentRepository.findByIdForUpdate(tournamentId)
                 .orElseThrow(() -> new IllegalArgumentException("Tournament not found with ID: " + tournamentId));
 
         if (!"REGISTRATION_OPEN".equals(tournament.getStatus())) {
