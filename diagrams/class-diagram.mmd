@@ -1,0 +1,186 @@
+classDiagram
+    class Role {
+        +Long id
+        +String name
+    }
+
+    class User {
+        +Long id
+        +String email
+        +String passwordHash
+        +String fullName
+        +String phone
+        +Boolean isActive
+        +LocalDateTime createdAt
+        +LocalDateTime updatedAt
+    }
+
+    class Station {
+        +Long id
+        +String stationNumber
+        +String stationType
+        +String status
+        +BigDecimal hourlyRate
+        +LocalDateTime createdAt
+    }
+
+    class Game {
+        +Long id
+        +String title
+        +String genre
+        +String platform
+        +Integer minAge
+        +Boolean isActive
+    }
+
+    class StationGame {
+        +Long id
+        +LocalDateTime installedAt
+    }
+
+    class Booking {
+        +Long id
+        +LocalDateTime startTime
+        +LocalDateTime endTime
+        +String status
+        +BigDecimal totalPrice
+        +String checkinCode
+        +LocalDateTime checkedInAt
+        +LocalDateTime createdAt
+    }
+
+    class WaitlistEntry {
+        +Long id
+        +LocalDate requestedDate
+        +Integer requestedHour
+        +String status
+        +LocalDateTime notifiedAt
+    }
+
+    class PricingRule {
+        +Long id
+        +String ruleName
+        +String stationType
+        +Integer startHour
+        +Integer endHour
+        +String rateType
+        +BigDecimal multiplier
+        +Boolean isActive
+    }
+
+    class Reward {
+        +Long id
+        +String name
+        +String description
+        +Integer pointsCost
+        +Integer stockQuantity
+        +Boolean isActive
+    }
+
+    class PointsLedger {
+        +Long id
+        +Integer pointsChange
+        +String transactionType
+        +String description
+        +LocalDateTime createdAt
+    }
+
+    class Tournament {
+        +Long id
+        +String name
+        +String format
+        +String status
+        +Integer maxParticipants
+        +BigDecimal entryFee
+        +BigDecimal prizePool
+        +LocalDateTime startTime
+        +LocalDateTime endTime
+    }
+
+    class TournamentPlayer {
+        +Long id
+        +Integer seed
+        +Integer finalRank
+        +String status
+        +LocalDateTime registeredAt
+    }
+
+    class Match {
+        +Long id
+        +Integer roundNumber
+        +Integer bracketPosition
+        +String matchType
+        +String status
+        +LocalDateTime scheduledAt
+        +LocalDateTime completedAt
+    }
+
+    class MatchResult {
+        +Long id
+        +String outcome
+        +Integer score
+        +Integer ratingChange
+        +Integer rankPlacement
+    }
+
+    class PlayerRating {
+        +Long id
+        +Integer currentRating
+        +Integer matchesPlayed
+        +LocalDateTime lastUpdatedAt
+    }
+
+    class Badge {
+        +Long id
+        +String code
+        +String name
+        +String description
+        +String icon
+    }
+
+    class UserBadge {
+        +Long id
+        +LocalDateTime earnedAt
+    }
+
+    class AuditLog {
+        +Long id
+        +String action
+        +String entityName
+        +Long entityId
+        +String oldValue
+        +String newValue
+        +String ipAddress
+        +LocalDateTime createdAt
+    }
+
+    Role "1" <-- "*" User : assigned
+    Station "1" <-- "*" StationGame
+    Game "1" <-- "*" StationGame
+
+    User "1" <-- "*" Booking
+    Station "1" <-- "*" Booking
+    User "1" <-- "*" WaitlistEntry
+    Station "1" <-- "*" WaitlistEntry
+
+    User "1" <-- "*" PointsLedger
+    Booking "0..1" <-- "*" PointsLedger
+    Reward "0..1" <-- "*" PointsLedger
+
+    Game "1" <-- "*" Tournament
+    Tournament "1" <-- "*" TournamentPlayer
+    User "1" <-- "*" TournamentPlayer
+
+    Game "1" <-- "*" Match
+    Tournament "0..1" <-- "*" Match
+    Match "0..1" <-- "*" Match : nextMatch
+    Match "1" <-- "*" MatchResult
+    User "1" <-- "*" MatchResult
+
+    User "1" <-- "*" PlayerRating
+    Game "1" <-- "*" PlayerRating
+
+    User "1" <-- "*" UserBadge
+    Badge "1" <-- "*" UserBadge
+
+    User "0..1" <-- "*" AuditLog : actor

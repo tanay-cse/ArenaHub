@@ -1,0 +1,58 @@
+flowchart LR
+    Student(["Student / Player"])
+    Staff(["Staff / Desk Operator"])
+    Admin(["Admin / Arena Manager"])
+    Scheduler(["System Scheduler"])
+
+    subgraph ArenaHub["Arena Hub System"]
+        UC1(["Register & Login"])
+        UC2(["Browse Stations & Availability Heatmap"])
+        UC3(["Book / Cancel / Rebook 1-Hour Slot"])
+        UC4(["View Booking QR Code"])
+        UC5(["Join Waitlist & Receive Notification"])
+        UC6(["View Points Ledger & Redeem Rewards"])
+        UC7(["Record Ranked Match & View Leaderboard/Badges"])
+        UC8(["Join Tournament, Report Score & Raise Dispute"])
+
+        UC9(["Scan QR / Manual Desk Check-in"])
+        UC10(["Monitor Live Status Board"])
+
+        UC11(["Manage Stations & Games Catalog"])
+        UC12(["Configure Dynamic Pricing Rules"])
+        UC13(["Manage Rewards & Stock"])
+        UC14(["Create Tournament, Generate Bracket & Resolve Disputes"])
+        UC15(["Ban / Unban Users & Reset Points"])
+        UC16(["View Revenue Reports & Export CSV"])
+        UC17(["Inspect Audit Logs"])
+
+        UC18(["Auto-Transition Booking Statuses"])
+    end
+
+    Student --> UC1
+    Student --> UC2
+    Student --> UC3
+    Student --> UC4
+    Student --> UC5
+    Student --> UC6
+    Student --> UC7
+    Student --> UC8
+    Student --> UC10
+
+    Staff --> UC1
+    Staff --> UC2
+    Staff --> UC9
+    Staff --> UC10
+    Staff --> UC7
+    Staff --> UC8
+
+    Admin --> UC1
+    Admin --> UC10
+    Admin --> UC11
+    Admin --> UC12
+    Admin --> UC13
+    Admin --> UC14
+    Admin --> UC15
+    Admin --> UC16
+    Admin --> UC17
+
+    Scheduler --> UC18

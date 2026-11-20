@@ -1,0 +1,30 @@
+flowchart TD
+    Start(["Start: Player Selects Station & 1-Hour Slot"]) --> CheckAvail{"Is Slot Available?"}
+
+    CheckAvail -- No --> OfferWL["Prompt to Join Waitlist"]
+    OfferWL --> JoinWL["Insert WaitlistEntry (status = WAITING)"]
+    JoinWL --> WaitCancel["Wait for Existing Booking Cancellation"]
+    WaitCancel --> NotifyWL["Auto-Promote First Waiter (status = NOTIFIED)"]
+    NotifyWL --> EndWL(["End: User Notified to Book"])
+
+    CheckAvail -- Yes --> CalcPrice["PricingService Evaluates Active Rules (Peak / Off-Peak / Member)"]
+    CalcPrice --> LockTx["Begin Transaction & Attempt Insert (DB Unique Active Slot Guard)"]
+    LockTx --> Conflict{"Slot Conflict Detected?"}
+    Conflict -- Yes --> Reject["Return SlotAlreadyBookedException"]
+    Reject --> EndErr(["End: Prompt Alternate Slot"])
+
+    Conflict -- No --> GenCode["Generate Unique 10-Char Check-in Code & Save Booking (CONFIRMED)"]
+    GenCode --> AwardPts["Credit Loyalty Points in PointsLedger (EARNED_BOOKING)"]
+    AwardPts --> AuditBook["Write AuditLog Entry"]
+    AuditBook --> ActionChoice{"Before Session Starts"}
+
+    ActionChoice -- Player Cancels --> CancelTx["Set Status = CANCELLED (Frees active_slot_start)"]
+    CancelTx --> TriggerWL["WaitlistService Notifies Next Waiting User"]
+    TriggerWL --> EndCanc(["End: Booking Cancelled"])
+
+    ActionChoice -- Player Arrives --> ScanQR["Staff Scans QR Code or Enters Code at /checkin"]
+    ScanQR --> MarkCI["Validate Code & Set checked_in_at Timestamp"]
+    MarkCI --> AutoActive["BookingStatusScheduler Transitions CONFIRMED -> ACTIVE"]
+    AutoActive --> PlaySession["Session Displayed on Live /status-board with Countdown"]
+    PlaySession --> AutoComplete["BookingStatusScheduler Transitions ACTIVE -> COMPLETED at end_time"]
+    AutoComplete --> EndDone(["End: Session Completed"])

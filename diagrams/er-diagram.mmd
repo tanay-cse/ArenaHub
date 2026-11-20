@@ -1,0 +1,216 @@
+erDiagram
+    roles {
+        BIGINT id PK
+        VARCHAR name UK
+    }
+
+    users {
+        BIGINT id PK
+        BIGINT role_id FK
+        VARCHAR email UK
+        VARCHAR password_hash
+        VARCHAR full_name
+        VARCHAR phone UK
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    games {
+        BIGINT id PK
+        VARCHAR title UK
+        VARCHAR genre
+        VARCHAR platform
+        INT min_age
+        BOOLEAN is_active
+        DATETIME created_at
+    }
+
+    stations {
+        BIGINT id PK
+        VARCHAR station_number UK
+        VARCHAR station_type
+        VARCHAR status
+        DECIMAL hourly_rate
+        DATETIME created_at
+    }
+
+    station_games {
+        BIGINT id PK
+        BIGINT station_id FK
+        BIGINT game_id FK
+        DATETIME installed_at
+    }
+
+    bookings {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT station_id FK
+        DATETIME start_time
+        DATETIME end_time
+        VARCHAR status
+        DECIMAL total_price
+        DATETIME active_slot_start
+        VARCHAR checkin_code UK
+        DATETIME checked_in_at
+        DATETIME created_at
+    }
+
+    waitlist {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT station_id FK
+        DATE requested_date
+        TINYINT requested_hour
+        VARCHAR status
+        DATETIME created_at
+        DATETIME notified_at
+    }
+
+    pricing_rules {
+        BIGINT id PK
+        VARCHAR rule_name
+        VARCHAR station_type
+        TINYINT start_hour
+        TINYINT end_hour
+        VARCHAR rate_type
+        DECIMAL multiplier
+        BOOLEAN is_active
+        DATETIME created_at
+    }
+
+    rewards {
+        BIGINT id PK
+        VARCHAR name UK
+        TEXT description
+        INT points_cost
+        INT stock_quantity
+        BOOLEAN is_active
+        DATETIME created_at
+    }
+
+    points_ledger {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT booking_id FK
+        BIGINT reward_id FK
+        INT points_change
+        VARCHAR transaction_type
+        VARCHAR description
+        DATETIME created_at
+    }
+
+    audit_logs {
+        BIGINT id PK
+        BIGINT user_id FK
+        VARCHAR action
+        VARCHAR entity_name
+        BIGINT entity_id
+        JSON old_value
+        JSON new_value
+        VARCHAR ip_address
+        DATETIME created_at
+    }
+
+    tournaments {
+        BIGINT id PK
+        BIGINT game_id FK
+        VARCHAR name
+        VARCHAR format
+        VARCHAR status
+        INT max_participants
+        DECIMAL entry_fee
+        DECIMAL prize_pool
+        DATETIME start_time
+        DATETIME end_time
+        DATETIME created_at
+    }
+
+    tournament_players {
+        BIGINT id PK
+        BIGINT tournament_id FK
+        BIGINT user_id FK
+        INT seed
+        INT final_rank
+        VARCHAR status
+        DATETIME registered_at
+    }
+
+    player_ratings {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT game_id FK
+        INT current_rating
+        INT matches_played
+        DATETIME last_updated_at
+    }
+
+    matches {
+        BIGINT id PK
+        BIGINT game_id FK
+        BIGINT tournament_id FK
+        BIGINT next_match_id FK
+        INT round_number
+        INT bracket_position
+        VARCHAR match_type
+        VARCHAR status
+        DATETIME scheduled_at
+        DATETIME completed_at
+    }
+
+    match_results {
+        BIGINT id PK
+        BIGINT match_id FK
+        BIGINT user_id FK
+        VARCHAR outcome
+        INT score
+        INT rating_change
+        INT rank_placement
+        DATETIME created_at
+    }
+
+    badges {
+        BIGINT id PK
+        VARCHAR code UK
+        VARCHAR name
+        VARCHAR description
+        VARCHAR icon
+    }
+
+    user_badges {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT badge_id FK
+        DATETIME earned_at
+    }
+
+    roles ||--o{ users : "has"
+    stations ||--o{ station_games : "installs"
+    games ||--o{ station_games : "installed_on"
+
+    users ||--o{ bookings : "makes"
+    stations ||--o{ bookings : "reserved_in"
+    users ||--o{ waitlist : "joins"
+    stations ||--o{ waitlist : "queued_for"
+
+    users ||--o{ points_ledger : "owns"
+    bookings ||--o{ points_ledger : "earns_from"
+    rewards ||--o{ points_ledger : "redeemed_in"
+
+    users ||--o{ audit_logs : "performs"
+
+    games ||--o{ tournaments : "hosts"
+    tournaments ||--o{ tournament_players : "registers"
+    users ||--o{ tournament_players : "participates"
+
+    games ||--o{ matches : "played_in"
+    tournaments ||--o{ matches : "contains"
+    matches ||--o{ matches : "advances_to"
+    matches ||--o{ match_results : "records"
+    users ||--o{ match_results : "achieves"
+
+    users ||--o{ player_ratings : "holds"
+    games ||--o{ player_ratings : "rated_in"
+
+    users ||--o{ user_badges : "earns"
+    badges ||--o{ user_badges : "awarded_as"
